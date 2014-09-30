@@ -1,0 +1,11 @@
+[files]
+url=ftp://ftp.gnu.org/pub/gnu/sed/
+file=sed-4.2.tar.gz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --disable-acl --disable-rpath --disable-i18n 
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

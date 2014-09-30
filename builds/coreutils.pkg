@@ -1,0 +1,11 @@
+[files]
+file=coreutils-8.22.tar.xz
+
+
+[build]
+./configure CFLAGS="-I/home/qafir/linux/env/usr/include" --prefix=/usr --bindir=/bin --sbindir=/sbin --libdir=/lib --sysconfdir=/etc --localstatedir=/var --without-openssl --disable-acl --disable-libsmack --disable-libcap --disable-rpath
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

@@ -1,0 +1,12 @@
+[files]
+file=kmod-14.tar.xz
+
+[build]
+./configure CFLAGS="-I/home/qafir/linux/env/usr/include" --prefix=/usr --libdir=/lib --bindir=/bin --sbindir=/sbin --enable-manpages --with-sysroot=/home/qafir/linux/env/lib --enable-tools
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install
+pushd /tmp/pkg/bin; ln -s kmod insmod; ln -s kmod rmmod; ln -s kmod lsmod; ln -s kmod modinfo; ln -s kmod modprobe; ln -s kmod depmod; popd
+

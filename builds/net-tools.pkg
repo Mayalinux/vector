@@ -1,0 +1,14 @@
+[files]
+file=net-tools-1.60.tar.bz2
+
+[build]
+
+# Apply patch first
+
+make config
+
+make
+
+[install]
+make install
+

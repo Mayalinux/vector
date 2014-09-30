@@ -1,0 +1,11 @@
+[files]
+url=http://savannah.gnu.org/projects/texinfo
+file=texinfo-5.2.tar.gz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --disable-rpath --enable-perl-api-texi-build
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

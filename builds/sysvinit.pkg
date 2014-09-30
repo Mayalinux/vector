@@ -1,0 +1,9 @@
+[files]
+file=sysvinit-latest.tar.bz2
+
+[build]
+make
+
+[install]
+make ROOT=/tmp/pkg install
+

@@ -1,0 +1,10 @@
+[files]
+file=less-451.tar.gz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --with-regex=gnu --with-editor=vim
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

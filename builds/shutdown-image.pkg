@@ -1,0 +1,13 @@
+[build]
+
+pushd /tmp/pkg
+
+tar xf ~wisedevil/linux/pkgs/stage1/glibc-2.19.tar.xz
+tar xf ~wisedevil/linux/pkgs/stage1/sysvinit-2.88dsf.tar.xz
+tar xf ~wisedevil/linux/pkgs/stage1/coreutils-8.22.tar.xz
+
+rm -rf usr/{share/,include/} var/ 
+
+tar cJvf shutdown.tar.xz *
+popd
+

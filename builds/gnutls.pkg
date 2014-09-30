@@ -1,0 +1,13 @@
+[files]
+file=gnutls-2.99.4.tar.xz
+
+[build]
+# Apply patch first
+
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath CFLAGS="-I/wisedevil/linux/env/usr/include"
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install
+

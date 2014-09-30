@@ -1,0 +1,11 @@
+[files]
+file=readline-6.2.tar.gz
+
+[build]
+../readline-6.2/./configure CFLAGS="-I/home/qafir/linux/env/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-curses
+
+make -j5
+
+
+[install]
+make DESTDIR=/tmp/pkg/ install

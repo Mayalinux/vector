@@ -1,0 +1,11 @@
+[files]
+file=syslinux-6.02.tar.xz
+
+[notes]
+apply own-written patch to remove efi32 and efi64 targets to Makefile
+
+[build]
+make bios
+
+[install]
+make INSTALLROOT=/tmp/pkg/ install

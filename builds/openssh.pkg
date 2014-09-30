@@ -1,0 +1,10 @@
+[files]
+file=openssh-6.5p1.tar.gz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --without-rpath --with-cflags --with-pam
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

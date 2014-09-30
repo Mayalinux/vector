@@ -1,0 +1,4 @@
+stage1: The system have to boot properly, init=/bin/bash is allowed (all dependencies must be installed as well)
+stage2: The system must be able to connect to internet and check if connection has been established (all dependencies must be installed as well)
+stage3: The system must be able to download, extract and install packages by itself. It must also be fully capable of configuring a new system bottom-up.
+stageP: System configuration files and scripts

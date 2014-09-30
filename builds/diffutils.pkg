@@ -1,0 +1,10 @@
+[files]
+file=diffutils-3.3.tar.xz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --disable-rpath
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

@@ -1,0 +1,12 @@
+[files]
+url=ftp://gmplib.org/pub/gmp-5.1.3/
+url=https://gmplib.org/
+file=gmp-5.1.3.tar.xz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --with-readline --with-sysroot=/home/qafir/linux/env 
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

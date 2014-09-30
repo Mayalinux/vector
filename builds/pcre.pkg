@@ -1,0 +1,11 @@
+[files]
+url=http://pcre.org/
+file=pcre-8.34.tar.bz2
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --enable-pcre32 --enable-pcre16 --enable-jit --enable-utf --enable-unicode-properties --enable-newline-is-anycrlf --enable-pcretest-libreadline --with-sysroot=/home/qafir/linux/env/usr 
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

@@ -1,0 +1,12 @@
+[files]
+file=gawk-4.1.0.tar.xz
+
+[build]
+
+./configure --prefix=/usr CFLAGS="-I/home/qafir/linux/env/usr/include" --sysconfdir=/etc --localstatedir=/var --disable-lint --disable-rpath --with-readline=/home/qafir/linux/env/usr
+
+make -j5
+
+[install]
+
+make DESTDIR=/tmp/pkg install

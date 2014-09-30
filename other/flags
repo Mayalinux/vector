@@ -1,0 +1,1 @@
+CFLAGS="-I/home/qafir/linux/env/usr/include -march=native -mmmx -msse -msse2 -mssse3 -msse4.1 -msse4.2 -mavx -maes -mfsgsbase -mrdrnd -mf16c -mpopcnt -m64" LDFLAGS="-march=native -mmmx -msse -msse2 -mssse3 -msse4.1 -msse4.2 -mavx -maes -mfsgsbase -mrdrnd -mf16c -mpopcnt -m64"  --prefix=/usr --sysconfdir=/etc --localstatedir=/var

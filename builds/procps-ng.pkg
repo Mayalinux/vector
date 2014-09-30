@@ -1,0 +1,12 @@
+[files]
+file=procps-ng-3.3.9.tar.xz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --disable-rpath --disable-kill --enable-examples --enable-wide-percent --with-sysroot=/home/qafir/linux/env/usr LDFLAGS="-L/home/qafir/linux/env/usr/lib -L/home/qafir/linux/env/usr/lib64" --without-systemd
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install
+
+pushd /tmp/pkg/usr; mv usr/bin/* bin/; rmdir usr/bin && rmdir usr/ && popd;

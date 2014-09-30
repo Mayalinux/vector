@@ -1,0 +1,14 @@
+[files]
+file=nettle-2.6.tar.gz
+url=http://www.lysator.liu.se/~nisse/nettle/
+url=ftp://ftp.lysator.liu.se/pub/security/lsh/
+
+[build]
+
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --with-lib-path="/home/qafir/linux/env/usr/lib:/home/qafir/linux/env/usr/lib64"
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install
+

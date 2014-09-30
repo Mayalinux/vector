@@ -1,0 +1,10 @@
+[files]
+file=autoconf-2.69.tar.xz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include"
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

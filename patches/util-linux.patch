@@ -1,0 +1,16 @@
+*** Makefile.in	2014-01-20 13:36:29.000000000 +0100
+--- Makefile.in	2014-02-23 12:07:08.436092963 +0100
+***************
+*** 11020,11030 ****
+  @BUILD_LIBMOUNT_TRUE@uninstall-hook-libmount:
+  @BUILD_LIBMOUNT_TRUE@	rm -f $(DESTDIR)$(libdir)/libmount.so*
+  @BUILD_WALL_TRUE@@MAKEINSTALL_DO_CHOWN_TRUE@@USE_TTY_GROUP_TRUE@install-exec-hook-wall::
+- @BUILD_WALL_TRUE@@MAKEINSTALL_DO_CHOWN_TRUE@@USE_TTY_GROUP_TRUE@	chgrp tty $(DESTDIR)$(usrbin_execdir)/wall
+  @BUILD_WALL_TRUE@@MAKEINSTALL_DO_CHOWN_TRUE@@USE_TTY_GROUP_TRUE@	chmod g+s $(DESTDIR)$(usrbin_execdir)/wall
+  
+  @BUILD_WRITE_TRUE@@MAKEINSTALL_DO_CHOWN_TRUE@@USE_TTY_GROUP_TRUE@install-exec-hook-write::
+- @BUILD_WRITE_TRUE@@MAKEINSTALL_DO_CHOWN_TRUE@@USE_TTY_GROUP_TRUE@	chgrp tty $(DESTDIR)$(usrbin_execdir)/write
+  @BUILD_WRITE_TRUE@@MAKEINSTALL_DO_CHOWN_TRUE@@USE_TTY_GROUP_TRUE@	chmod g+s $(DESTDIR)$(usrbin_execdir)/write
+  
+  @BUILD_LAST_TRUE@install-exec-hook-last:
+--- 11020,11028 ----

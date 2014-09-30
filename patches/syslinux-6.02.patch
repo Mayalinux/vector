@@ -1,0 +1,69 @@
+*** Makefile	2014-02-16 23:19:11.308928235 +0100
+--- Makefile	2014-02-16 23:20:53.566889017 +0100
+***************
+*** 84,90 ****
+  # creating. Which means that we always need a *real* target, such as
+  # 'all', appended to the make goals.
+  #
+! firmware = bios efi32 efi64
+  real-target := $(filter-out $(firmware), $(MAKECMDGOALS))
+  real-firmware := $(filter $(firmware), $(MAKECMDGOALS))
+  
+--- 84,90 ----
+  # creating. Which means that we always need a *real* target, such as
+  # 'all', appended to the make goals.
+  #
+! firmware = bios
+  real-target := $(filter-out $(firmware), $(MAKECMDGOALS))
+  real-firmware := $(filter $(firmware), $(MAKECMDGOALS))
+  
+***************
+*** 222,233 ****
+  
+  ifeq ($(HAVE_FIRMWARE),)
+  
+! firmware = bios efi32 efi64
+  
+  # If no firmware was specified the rest of MAKECMDGOALS applies to all
+  # firmware.
+  ifeq ($(filter $(firmware),$(MAKECMDGOALS)),)
+! all strip tidy clean dist spotless install installer netinstall: bios efi32 efi64
+  
+  else
+  
+--- 222,233 ----
+  
+  ifeq ($(HAVE_FIRMWARE),)
+  
+! firmware = bios
+  
+  # If no firmware was specified the rest of MAKECMDGOALS applies to all
+  # firmware.
+  ifeq ($(filter $(firmware),$(MAKECMDGOALS)),)
+! all strip tidy clean dist spotless install installer netinstall: bios
+  
+  else
+  
+***************
+*** 255,274 ****
+  		objdir=$(OBJ)/bios OBJ=$(OBJ)/bios HAVE_FIRMWARE=1 \
+  		ARCH=i386 LDLINUX=ldlinux.c32 $(MAKECMDGOALS)
+  
+- efi32:
+- 	@mkdir -p $(OBJ)/efi32
+- 	$(MAKE) -C $(OBJ)/efi32 -f $(SRC)/Makefile SRC="$(SRC)" \
+- 		objdir=$(OBJ)/efi32 OBJ=$(OBJ)/efi32 HAVE_FIRMWARE=1 \
+- 		ARCH=i386 BITS=32 EFI_BUILD=1 LDLINUX=ldlinux.e32 \
+- 		$(MAKECMDGOALS)
+- 
+- efi64:
+- 	@mkdir -p $(OBJ)/efi64
+- 	$(MAKE) -C $(OBJ)/efi64 -f $(SRC)/Makefile SRC="$(SRC)" \
+- 		objdir=$(OBJ)/efi64 OBJ=$(OBJ)/efi64 HAVE_FIRMWARE=1 \
+- 		ARCH=x86_64 BITS=64 EFI_BUILD=1 LDLINUX=ldlinux.e64 \
+- 		$(MAKECMDGOALS)
+- 
+  else # ifeq($(HAVE_FIRMWARE),)
+  
+  all: all-local subdirs
+--- 255,260 ----

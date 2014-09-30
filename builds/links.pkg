@@ -1,0 +1,10 @@
+[files]
+file=links-2.8.tar.gz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --without-gpm --with-ssl --without-x --without-svgalib --without-fb --without-directfb --without-pmshell --without-windows --without-atheos --without-grx --without-libjpeg --without-libtiff --without-bzip2
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

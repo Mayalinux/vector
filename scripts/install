@@ -1,0 +1,77 @@
+#!/bin/bash
+
+###
+### This script installs the stage files in a directory
+### and if the current user is 'root', it sets all the
+### owners and groups to 'root'
+###
+####
+#### Author: Alfredo Mungo <chimeranet89@gmail.com>
+####
+#### Usage: install {dir}
+####
+#### dir is the directory where the files need to be installed
+####
+
+shopt -s nullglob
+
+exec 3>/dev/null
+
+# Constants
+PKG_DIR=$(realpath ./pkgs)
+
+# Arguments
+DST_DIR=$1
+
+# Check arguments
+[[ -z "$DST_DIR" ]] && echo "ERROR: destination directory not provided" >&2 && exit 1
+
+[[ ! -d "$DST_DIR" ]] && echo "ERROR: destination directory <${DST_DIR}> does not exist" >&2 && exit 1
+
+#
+# Copies a stage directory (extracts the archives)
+#
+# $1 is the stage number
+function copyStage() {
+	local STG_DIR=${PKG_DIR}/stage${1}
+
+	[[ ! -d "$STG_DIR" ]] && echo "ERROR: stage directory <${STG_DIR}> does not exist" >&2 && exit 2
+
+	echo "Installing stage ${1}..."
+
+	pushd "$DST_DIR" >&3
+	for f in ${STG_DIR}/*.tar.xz; do
+		if [[ -r "$f" ]]; then
+			tar xf "$f" || (echo "ERROR: unable to extract archive <$f>" >&2 && exit 2)
+		else
+			echo "Skipping unaccessible file <$f>..."
+		fi
+	done
+	popd >&3
+}
+
+copyStage 1
+copyStage 2
+copyStage 3
+copyStage P
+
+echo Adding directories...
+mkdir -p ${DST_DIR}/{dev,proc,sys,tmp,root,opt,var/log,home,var/run}
+
+pushd ${DST_DIR} >&3
+ln -s var/run run
+popd >&3
+
+if [[ "$USER" = root ]]; then
+	echo "Setting owners and groups..."
+	chown -R root:root "$DST_DIR"
+	chmod -Rf +x ${DST_DIR}/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin,etc/init.d}
+
+	echo "running ldconfig..."
+	ldconfig -r ${DST_DIR}
+
+	echo "WARNING: syslinux must be installed manually to boot the system"
+else
+	echo "User is not root, not setting advanced environment up."
+fi
+

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+###
+### Configuration files maker
+###
+####
+#### Author: Alfredo Mungo <chimeranet89@gmail.com>
+####
+#### Usage: mkconf
+####
+
+exec 3>/dev/null
+
+# Constants
+PKG_DIR=/tmp/pkg
+PKS_DIR="$(realpath .)/pkgs"
+
+# Check environment
+[[ ! -d "$PKG_DIR" ]] && echo "ERROR: Packaging directory <${PKG_DIR}> does not exist" >&2 && exit 1
+
+pushd $PKG_DIR >&3
+tar xvf $PKS_DIR/stageP/misc-config.tar.xz
+popd >&3

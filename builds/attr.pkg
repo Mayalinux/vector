@@ -1,0 +1,11 @@
+[files]
+file=attr-2.4.47.src.tar.gz
+
+[build]
+./configure --prefix=/usr --libdir=/lib --bindir=/bin --sbindir=/sbin CFLAGS="-I/home/qafir/linux/env/usr/include" --with-sysroot=/home/qafir/linux/env/lib
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install
+make DESTDIR=/tmp/pkg install-lib

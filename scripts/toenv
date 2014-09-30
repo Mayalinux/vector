@@ -1,0 +1,43 @@
+#!/bin/bash
+
+###
+### This script extracts a stage package to the env folder
+###
+####
+#### Author: Alfredo Mungo <chimeranet89@gmail.com>
+####
+#### Usage: toenv {stage#} {pkg}
+####
+#### stage# is the stage number, it must be 1, 2 or 3
+#### pkg is the packge name (e.g.: linux-3.13.3)
+####
+
+exec 3>/dev/null
+
+# Constants
+ENV_DIR=~/linux/env
+PKG_DIR=~/linux/pkgs
+
+# Arguments
+STAGE="$1"
+PKG="$2"
+
+# Check arguments
+[[ -z "$STAGE" ]] && echo "ERROR: no stage selected" && exit 1
+[[ -z "$PKG" ]] && echo "ERROR: no package selected" && exit 1
+
+# Set package file
+PKG_FILE="${PKG}.tar.xz"
+PKG_PATH="${PKG_DIR}/stage${STAGE}/${PKG_FILE}"
+
+# Check environment
+[[ ! -d "${ENV_DIR}" ]] && echo "ERROR: environment directory <${ENV_DIR}> does not exist" && exit 1
+[[ ! -r "${PKG_PATH}" ]] && echo "ERROR package file <${PKG_PATH}> does not exist or is not readable" && exit 1
+
+# Extract package
+echo "Extracting package ${PKG_FILE}..."
+
+pushd "$ENV_DIR" >&3
+tar xf "$PKG_PATH" >&3
+popd >&3
+

@@ -1,0 +1,10 @@
+[files]
+file=inetutils-1.9.1.100.tar.xz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --with-pam CFLAGS="-I/home/qafir/linux/env/usr/include"
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

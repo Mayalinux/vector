@@ -1,0 +1,10 @@
+[files]
+file=vim-7.4.tar.bz2
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --disable-darwin --disable-selinux --disable-xsmp --disable-xsmp-interact --disable-netbeans --enable-multibyte --enable-gui=no --disable-gpm --disable-sysmouse --without-x --disable-acl
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

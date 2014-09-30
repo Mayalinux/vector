@@ -1,0 +1,10 @@
+[files]
+file=curl-7.35.0.tar.gz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/linux/env/usr/include" --enable-http --enable-ftp --enable-file --disable-ldap --disable-ldaps --disable-rtsp --enable-proxy --disable-dict --enable-telnet --enable-tftp --enable-pop3 --enable-imap --enable-smtp --disable-gopher --enable-ipv6 --enable-crypto-auth --enable-tls-srp --disable-ntlm-wb --disable-sspi --with-sysroot=/home/qafir/linux/env --without-winssl --without-darwinssl --without-polarssl --without-cyassl --without-axtls --without-libmetalink --without-winidn --without-librtmp --without-libidn --without-nghttp2 --without-libssh2
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

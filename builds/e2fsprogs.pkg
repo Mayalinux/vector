@@ -1,0 +1,10 @@
+[files]
+file=e2fsprogs-1.42.9.tar.xz
+
+[build]
+./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var CFLAGS="-I/home/qafir/env/linux/usr/include" --enable-symlink-build --enable-elf-shlibs --enable-fsck --disable-rpath 
+
+make -j5
+
+[install]
+make DESTDIR=/tmp/pkg install

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+###
+### This script clears the build environment
+###
+#### Author: Alfredo Mungo <chimeranet89@gmail.com>
+####
+#### Usage: groundup y
+####
+#### y must be used to ensure this is not an accidental command issue
+####
+
+# Directories
+PKG_DIR=./pkgs
+ENV_DIR=./env
+STG_DIR=./stage
+BLD_DIR=/tmp/pkg
+
+[[ "$1" != y ]] && echo "SECURE LOCK: aborting..." && exit 1
+
+# Wait 5 seconds before starting
+echo "5 seconds to cleanup. Hit ^C to abort..."
+echo -n ">>>"
+
+for i in 5 4 3 2 1; do
+	echo -n " $i"
+	sleep 1
+done
+
+echo
+echo
+
+# Clean old files
+echo "Removing old directories..."
+rm -rf ${ENV_DIR} ${PKG_DIR} ${STG_DIR} ${BLD_DIR}
+
+# Populate new structure
+echo "Populating new directory hierarchy..."
+mkdir -p ${PKG_DIR}/{stage1,stage2,stage3,stageP}
+mkdir ${ENV_DIR}
+mkdir ${STG_DIR}
+mkdir ${BLD_DIR}
+
+# Set to stage 1
+./setstage 1
+

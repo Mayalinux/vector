@@ -1,0 +1,9 @@
+[files]
+file=
+
+[build]
+# Apply patch before make
+make
+
+[install]
+make DESTDIR=/tmp/pkg install
