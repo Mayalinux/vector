@@ -1,0 +1,33 @@
+###
+### Build file template
+###
+#### See builder file for information about available functions and
+#### variables.
+####
+#### If you don't need to edit one or more of the following functions,
+#### feel free to remove them.
+####
+
+PACKAGE_NAME=""
+PACKAGE_DESCRIPTION=""
+PROJECT_URL=""
+PACKAGE_URL="http://.../${PACKAGE_NAME}.tar.bz2"
+
+function download() {
+  download_file "$PACKAGE_URL" "$PACKAGE_PATH"
+}
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  echo "ERROR: No build action defined!" >&2
+  exit 1
+}
+
+function pack() {
+  ../scripts/pack "$STAGE" "$PACKAGE_NAME"
+}
+
+function info() {
+  echo -e "$PACKAGE_NAME: $PACKAGE_DESCRIPTION\n\t$PROJECT_URL\n"
+}

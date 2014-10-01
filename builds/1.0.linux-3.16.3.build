@@ -1,0 +1,30 @@
+PACKAGE_NAME="linux-3.16.3"
+PACKAGE_DESCRIPTION="Linux kernel"
+PROJECT_URL="https://www.kernel.org"
+PACKAGE_URL="https://www.kernel.org/pub/linux/kernel/v3.x/${PACKAGE_NAME}.tar.xz"
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$(dirname "$0")/.."
+
+  local KDIR="./$PACKAGE_NAME"
+
+  execute cp "$OTHER_DIR/linux-config" "$KDIR/.config"
+
+  execute make -C "$KDIR" -j$(($N_CPUS+1)) all
+  execute make -C "$KDIR" INSTALL_MOD_PATH="$BLD_DIR" modules_install
+  execute make -C "$KDIR" headers_install
+
+  local kimg="$KDIR/arch/x86/boot/bzImage"
+  local vmlinuz="vmlinuz-$(echo "$PACKAGE_NAME" | cut -d - -f 2)"
+
+  execute mkdir -p "$BLD_DIR/boot"
+  execute cp "$kimg" "$BLD_DIR/boot/$vmlinuz"
+  execute cp "$KDIR/System.map" "$BLD_DIR/boot/"
+  execute cp "$KDIR/.config" "$BLD_DIR/boot/linux-config"
+
+  pushd "$BLD_DIR/boot" >/dev/null
+  execute ln -s "$vmlinuz" vmlinuz
+  popd >/dev/null
+}

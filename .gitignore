@@ -1,0 +1,4 @@
+pkgs/*
+linux*/*
+build/*
+cache/*

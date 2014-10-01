@@ -36,7 +36,3 @@ mkdir -p ${PKG_DIR}/{stage1,stage2,stage3,stageP}
 mkdir ${ENV_DIR}
 mkdir ${STG_DIR}
 mkdir ${BLD_DIR}
-
-# Set to stage 1
-./setstage 1
-

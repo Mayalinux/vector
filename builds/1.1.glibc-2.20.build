@@ -1,0 +1,19 @@
+PACKAGE_NAME="glibc-2.20"
+PACKAGE_DESCRIPTION="GNU C Library"
+PROJECT_URL="http://www.gnu.org/software/libc/"
+PACKAGE_URL="http://ftp.gnu.org/gnu/glibc/${PACKAGE_NAME}.tar.xz"
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  mkdir "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute "$BUILD_DIR/$PACKAGE_NAME/configure" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/lib --enable-shared --enable-add-ons --disable-nscd --disable-build-nscd --with-headers=$(realpath "$KERNEL_DIR/usr/include/") --enable-pt_chown
+  popd >/dev/null
+  execute make -C "$BDIR" -j$(($N_CPUS+1))
+  execute make -C "$BDIR" install_root="$BLD_DIR" install
+}

@@ -1,0 +1,174 @@
+#!/bin/bash
+
+###
+### Package build script
+###
+####
+#### Usage: builder action
+####
+#### action is one of the following:
+####  - download: Downloads the package to the cache
+####  - build: Builds the package from the cache
+####  - pack: Packages the compiled sources and places the archive in the right stage directory
+####  - all: Executes in order: download, build, pack
+####  - info: Prints package information
+####
+
+source scripts/dirs.inc.sh
+
+##
+## Download a file.
+##
+## Usage: download_file url filename
+##
+## url is the remote URL to download the file from
+## filename is the local file name to download the file to
+##
+function download_file() {
+  local url="$1"
+  local fname="$2"
+
+  if [[ ! -f "$fname" ]]; then
+    echo "Downloading ${url}..."
+    curl -L -# -o "$fname" "$url"
+
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR: Unable to download file $url" >&2
+      exit 1
+    fi
+  fi
+}
+
+##
+## Sets a dependency.
+## Dependencies are always built before the package that depends on it
+## and only if have not yet been built.
+##
+function depends() {
+  local dep_name="$1"
+  local dep_file="${dep_name}.tar.xz"
+
+  echo "Building dependency ${dep_name}..."
+  "$0" "$dep_name" all
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error building ${dep_name}. Exiting..." >&2
+    exit 1
+  fi
+}
+
+##
+## Exits if the required file does not exist.
+##
+## Usage: require filename
+##
+## filename is the file to check for existance
+##
+function require() {
+  if [[ ! -f "$1" ]]; then
+    echo "Required file $1 does not exist." >&2
+    exit 1
+  fi
+}
+
+##
+## Extracts a tar archive to a directory.
+##
+## Usage: extract_tar tarfile destdir
+##
+function extract_tar() {
+  local tarfile="$(realpath "$1")"
+  local dest="$2"
+
+  if [[ ! -d "$dest" ]]; then
+    echo "$dest is not a valid directory" >&2
+    exit 1
+  fi
+
+  pushd "$dest" >/dev/null
+  
+  echo "Extracting archive ${tarfile}..."
+  execute tar -xf "$tarfile"
+
+  popd >/dev/null
+}
+
+##
+## Executes a command and checks its exits 0.
+##
+## Usage: execute command [arg [...]]
+##
+function execute() {
+  [[ -n "$DEBUG" ]] && echo "$*"
+
+  $*
+
+  if [[ $? -ne 0 ]]; then
+    echo "$1 returned $?"
+    exit 1
+  fi
+}
+
+function download() {
+  download_file "$PACKAGE_URL" "$PACKAGE_PATH"
+}
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  echo "ERROR: No build action defined!" >&2
+  exit 1
+}
+
+function pack() {
+  execute $(dirname "$0")/pack "$STAGE" "$PACKAGE_NAME"
+}
+
+function info() {
+  echo -e "$PACKAGE_NAME: $PACKAGE_DESCRIPTION\n\t$PROJECT_URL\n"
+}
+
+# Clean output directory
+[[ ! -d "$BLD_DIR" ]] && execute mkdir -p "$BLD_DIR"
+[[ -n "$DEBUG" ]] && execute rm -rf $BLD_DIR/*
+
+# Clean build directory
+[[ ! -d "$BUILD_DIR" ]] && execute mkdir -p "$BUILD_DIR"
+[[ -n "$DEBUG" ]] && execute rm -rf $BUILD_DIR/*
+
+# Detect kernel directory
+KERNEL_DIR="$(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1)"
+[[ -z "$KERNEL_DIR" ]] && [[ ! "$1" =~ linux* ]] && echo "No kernel directory found in $(realpath .)" && exit 1
+
+# Detect number of CPUS
+N_CPUS="$((egrep '^processor' < /proc/cpuinfo ) | wc -l)"
+
+# Include build file
+BUILD_FILE=$(find $BUILDS_DIR -name "*.${1}.build"); shift
+source "$BUILD_FILE"
+
+PACKAGE_FILENAME="${PACKAGE_NAME}.tar.xz"
+STAGE=$(basename "$BUILD_FILE" | cut -d . -f 1)
+
+# Download location of the main package source code
+PACKAGE_PATH="${CACHE_DIR}/$PACKAGE_FILENAME"
+
+# Execute action
+case "$1" in
+  download)
+    download ;;
+  build)
+    build ;;
+  pack)
+    pack ;;
+  info)
+    info ;;
+  all)
+    download; build; pack ;;
+  * | "")
+    echo "WARNING: no action defined" >&2
+    exit 1
+    ;;
+esac
+
+true
