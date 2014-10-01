@@ -9,15 +9,12 @@
 #### Usage: mkconf
 ####
 
+source $(dirname "$0")/dirs.inc.sh
 exec 3>/dev/null
 
-# Constants
-PKG_DIR=/tmp/pkg
-PKS_DIR="$(realpath .)/pkgs"
-
 # Check environment
-[[ ! -d "$PKG_DIR" ]] && echo "ERROR: Packaging directory <${PKG_DIR}> does not exist" >&2 && exit 1
+[[ ! -d "$BLD_DIR" ]] && echo "ERROR: Packaging directory <${BLD_DIR}> does not exist" >&2 && exit 1
 
-pushd $PKG_DIR >&3
-tar xvf $PKS_DIR/stageP/misc-config.tar.xz
+pushd $BLD_DIR >&3
+tar xvf $PKG_DIR/stageP/misc-config.tar.xz
 popd >&3

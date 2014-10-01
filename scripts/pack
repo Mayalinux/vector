@@ -12,19 +12,16 @@
 #### stage# is the stage number (1, 2 or 3)
 #### pack-name is the package name (e.g.: linux-3.13.3)
 
+source $(dirname "$0")/dirs.inc.sh
 exec 3>/dev/null
-
-# Constants
-PKG_DIR="/tmp/pkg"
-DEV_DIR=~/linux/pkgs
 
 # Set args
 STAGE=$1
 PKG_NAME=$2
-STAGE_DIR="${DEV_DIR}/stage${STAGE}"
+STAGE_DIR="${PKG_DIR}/stage${STAGE}"
 
 # Check environment
-[[ ! -d "$PKG_DIR" ]] && echo "ERROR: Packaging directory <${PKG_DIR}> does not exist" >&2 && exit 1
+[[ ! -d "$BLD_DIR" ]] && echo "ERROR: Packaging directory <${BLD_DIR}> does not exist" >&2 && exit 1
 [[ ! -d "$STAGE_DIR" ]] && echo "ERROR: Stage directory <${STAGE_DIR}> does not exist" >&2 && exit 1
 
 # Check args
@@ -48,19 +45,19 @@ echo "Creating package ${PKG_FILE}:"
 # Compress package
 echo "- Compressing..."
 
-pushd "${PKG_DIR}" >&3
+pushd "${BLD_DIR}" >&3
 (tar --recursion -cJvf "$PKG_PATH" * | awk '{ print ">> " $0; }') || (echo "ERROR: Unable to create compressed tarball" >&2 && exit 2)
 popd >&3
 
 echo
 # Display size stats
 echo -n "- * Original size: "
-du -h "$PKG_DIR" | tail -n 1 | awk '{ print $1; }'
+du -h "$BLD_DIR" | tail -n 1 | awk '{ print $1; }'
 echo -n "- * Packed size: "
 du -h "$PKG_PATH" | awk '{ print $1; }'
 
 echo
 # Clean-up
 echo "- Cleaning up..."
-rm -rf ${PKG_DIR}/*
+rm -rf ${BLD_DIR}/*
 

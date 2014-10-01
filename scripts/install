@@ -13,19 +13,15 @@
 #### dir is the directory where the files need to be installed
 ####
 
+source $(dirname "$0")/dirs.inc.sh
 shopt -s nullglob
-
 exec 3>/dev/null
-
-# Constants
-PKG_DIR=$(realpath ./pkgs)
 
 # Arguments
 DST_DIR=$1
 
 # Check arguments
 [[ -z "$DST_DIR" ]] && echo "ERROR: destination directory not provided" >&2 && exit 1
-
 [[ ! -d "$DST_DIR" ]] && echo "ERROR: destination directory <${DST_DIR}> does not exist" >&2 && exit 1
 
 #
@@ -67,7 +63,7 @@ if [[ "$USER" = root ]]; then
 	chown -R root:root "$DST_DIR"
 	chmod -Rf +x ${DST_DIR}/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin,etc/init.d}
 
-	echo "running ldconfig..."
+	echo "Running ldconfig..."
 	ldconfig -r ${DST_DIR}
 
 	echo "WARNING: syslinux must be installed manually to boot the system"

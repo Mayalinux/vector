@@ -12,11 +12,8 @@
 #### pkg is the packge name (e.g.: linux-3.13.3)
 ####
 
+source $(dirname "$0")/dirs.inc.sh
 exec 3>/dev/null
-
-# Constants
-ENV_DIR=~/linux/env
-PKG_DIR=~/linux/pkgs
 
 # Arguments
 STAGE="$1"

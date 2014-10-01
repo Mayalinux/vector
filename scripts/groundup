@@ -10,11 +10,7 @@
 #### y must be used to ensure this is not an accidental command issue
 ####
 
-# Directories
-PKG_DIR=./pkgs
-ENV_DIR=./env
-STG_DIR=./stage
-BLD_DIR=/tmp/pkg
+source $(dirname "$0")/dirs.inc.sh
 
 [[ "$1" != y ]] && echo "SECURE LOCK: aborting..." && exit 1
 

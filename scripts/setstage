@@ -10,11 +10,8 @@
 #### stage# is the stage number. Must be 1, 2 or 3
 ####
 
+source $(dirname "$0")/dirs.inc.sh
 exec 3>/dev/null
-
-# Constants
-STG_DIR=./stage
-DEV_DIR=./devel
 
 # Arguments
 STAGE=$1
@@ -22,17 +19,10 @@ STAGE=$1
 # Check arguments
 [[ -z "$STAGE" ]] && echo "ERROR: No stage specified" >&2 && exit 1
 
-# Set data
-STAGE_DIR="${DEV_DIR}/stage${STAGE}"
-
-# Check devel directory
-[[ ! -d "$STAGE_DIR" ]] && echo "ERROR: Unknown stage directory <${STAGE_DIR}>" >&2 && exit 1
-
 # Set stage
 echo "Setting stage ${STAGE}..."
 rm -f ${STG_DIR}/*
 
-for pkgf in $STAGE_DIR/*; do
+for pkgf in $BUILDS_DIR/${STAGE}.*; do
 	ln -s "$(realpath $pkgf)" "${STG_DIR}/"
 done
-

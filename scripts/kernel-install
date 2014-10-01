@@ -11,10 +11,8 @@
 #### kernel-version is the complete kernel version, i.e.: 3.13.3
 ####
 
+source $(dirname "$0")/dirs.inc.sh
 exec 3>/dev/null
-
-# Constants
-PKG_DIR=/tmp/pkg
 
 # Arguments
 KNL_VER="$1"
@@ -32,16 +30,16 @@ KNL_OUT_FILE="vmlinuz-${KNL_VER}-wise"
 # Create directories
 echo "Populating directory hierarchy..."
 
-mkdir -p ${PKG_DIR}/{boot,lib} || (echo "ERROR: unable to create directory structure" && exit 2)
+mkdir -p ${BLD_DIR}/{boot,lib} || (echo "ERROR: unable to create directory structure" && exit 2)
 
 # Install files
 echo "Installing kernel files..."
-cp "${KNL_DIR}/arch/x86/boot/bzImage" "${PKG_DIR}/boot/${KNL_OUT_FILE}"
-cp "${KNL_DIR}/System.map" "${PKG_DIR}/boot/"
-make -C "${KNL_DIR}" INSTALL_MOD_PATH=${PKG_DIR} modules_install >&3
+cp "${KNL_DIR}/arch/x86/boot/bzImage" "${BLD_DIR}/boot/${KNL_OUT_FILE}"
+cp "${KNL_DIR}/System.map" "${BLD_DIR}/boot/"
+make -C "${KNL_DIR}" INSTALL_MOD_PATH=${BLD_DIR} modules_install >&3
 
 # Create links
-pushd "${PKG_DIR}/boot" >&3
+pushd "${BLD_DIR}/boot" >&3
 ln -s ${KNL_OUT_FILE} vmlinuz >&3
 popd >&3
 
