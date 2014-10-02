@@ -1,5 +1,5 @@
 pkgs/*
-/linux*/**
+/linux*
 build/*
 cache/*
 env/*

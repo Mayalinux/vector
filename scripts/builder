@@ -130,6 +130,9 @@ function info() {
   echo -e "$PACKAGE_NAME: $PACKAGE_DESCRIPTION\n\t$PROJECT_URL\n"
 }
 
+# Check cache directory
+[[ ! -d "$CACHE_DIR" ]] && execute mkdir -p "$CACHE_DIR"
+
 # Clean output directory
 [[ ! -d "$BLD_DIR" ]] && execute mkdir -p "$BLD_DIR"
 
@@ -138,6 +141,9 @@ function info() {
 
 # Checks environment directory
 [[ ! -d "$ENV_DIR" ]] && execute mkdir -p "$ENV_DIR"
+
+# Checks stage directory
+for dir in $PKG_DIR/stage{1,2,3,P}; do [[ ! -d "$dir" ]] && mkdir -p "$dir"; done
 
 # Detect kernel directory
 KERNEL_DIR="$(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1)"
