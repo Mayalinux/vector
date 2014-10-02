@@ -1,0 +1,56 @@
+PACKAGE_NAME="bash-4.3"
+PACKAGE_DESCRIPTION="Bourn Again Shell"
+PROJECT_URL="http://www.gnu.org/software/bash/"
+PACKAGE_URL="ftp://ftp.gnu.org/gnu/bash/${PACKAGE_NAME}.tar.gz"
+LIBRARY=no
+
+function download() {
+  download_file "$PACKAGE_URL" "$PACKAGE_PATH"
+
+  echo "Downloading patches..."
+
+  [[ ! -d "$CACHE_DIR/patches/$PACKAGE_NAME" ]] && execute mkdir -p "$CACHE_DIR/patches/$PACKAGE_NAME"
+
+  pushd "$CACHE_DIR/patches/$PACKAGE_NAME" >/dev/null
+  local pfiles
+
+  for pfile in $(curl -s -l ftp://ftp.gnu.org/gnu/bash/${PACKAGE_NAME}-patches/ | grep -v '.sig$'); do
+    [[ ! -f "$pfile" ]] && pfiles+=",$pfile"
+  done
+  [[ -n "$pfiles" ]] && execute curl -# -O "ftp://ftp.gnu.org/gnu/bash/${PACKAGE_NAME}-patches/{$(echo "$pfiles" | cut -d , -f 1 --complement)}"
+  popd >/dev/null
+}
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  pushd "$BUILD_DIR" >/dev/null
+  for pfile in $CACHE_DIR/patches/$PACKAGE_NAME/*; do
+    echo "Applying patch ${pfile}..."
+    sed \
+      -e "s:\.\./${PACKAGE_NAME}\.*[0-9]*/:$PACKAGE_NAME/:g" \
+      -e "s:\.\./${PACKAGE_NAME}\.*[0-9]*-patched/:$PACKAGE_NAME/:g" \
+      "$pfile" | patch -p0
+
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR: Unable to apply patch $pfile" >&2
+      exit 1
+    fi
+  done
+  popd >/dev/null
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --bindir=/bin --sbindir=/sbin --libdir=/lib --sysconfdir=/etc --localstatedir=/var --enable-alias --enable-arith-for-command --enable-array-variables --enable-brace-expansion --enable-casemod-attributes --enable-casemod-expansions --enable-command-timing --enable-cond-command --enable-cond-regexp --enable-coprocesses --enable-debugger --enable-directory-stack --enable-dparen-arithmetic --enable-extended-glob --enable-help-builtin --enable-history --enable-job-control --enable-multibyte --enable-net-redirections --enable-process-substitution --enable-progcomp --enable-readline --enable-select --enable-separate-helpfiles --enable-static-link --without-gnu-malloc --disable-rpath
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$BLD_DIR" install
+  popd >/dev/null
+
+  pushd "$BLD_DIR/bin" >/dev/null
+  execute ln -s bash sh
+  popd >/dev/null
+}

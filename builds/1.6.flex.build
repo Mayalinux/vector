@@ -1,0 +1,21 @@
+PACKAGE_NAME="flex-2.5.39"
+PACKAGE_DESCRIPTION="Flex lexical analyzer"
+PROJECT_URL="http://flex.sourceforge.net/"
+CACHE_EXTENSION=".tar.xz"
+PACKAGE_URL="http://downloads.sourceforge.net/project/flex/${PACKAGE_NAME}.tar.bz2"
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --disable-rpath --prefix=/usr --sysconfdir=/etc
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$BLD_DIR" install
+  popd >/dev/null
+}

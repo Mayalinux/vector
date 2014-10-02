@@ -1,0 +1,17 @@
+PACKAGE_NAME="sysvinit-2.88dsf"
+PACKAGE_DESCRIPTION="System V style init programs"
+PROJECT_URL="https://savannah.nongnu.org/projects/sysvinit"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="http://download.savannah.gnu.org/releases/sysvinit/${PACKAGE_NAME}.tar.bz2"
+LIBRARY=no
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
+  execute make
+  execute make ROOT="$BLD_DIR" install
+  popd >/dev/null
+}

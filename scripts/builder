@@ -152,11 +152,14 @@ KERNEL_DIR="$(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1)"
 # Detect number of CPUS
 N_CPUS="$((egrep '^processor' < /proc/cpuinfo ) | wc -l)"
 
+# Cache file default extension
+CACHE_EXTENSION=".tar.xz"
+
 # Include build file
 BUILD_FILE=$(find $BUILDS_DIR -name "*.${1}.build"); shift
 source "$BUILD_FILE"
 
-PACKAGE_FILENAME="${PACKAGE_NAME}.tar.xz"
+PACKAGE_FILENAME="${PACKAGE_NAME}${CACHE_EXTENSION}"
 STAGE=$(basename "$BUILD_FILE" | cut -d . -f 1)
 
 # Download location of the main package source code

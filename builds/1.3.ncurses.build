@@ -1,0 +1,32 @@
+PACKAGE_NAME="ncurses-5.9"
+PACKAGE_DESCRIPTION="Ncurses library for text based GUI"
+PROJECT_URL="https://www.gnu.org/software/ncurses/ncurses.html"
+PACKAGE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/${PACKAGE_NAME}.tar.gz"
+LIBRARY=yes
+
+function download() {
+  download_file "$PACKAGE_URL" "$PACKAGE_PATH"
+}
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local build_options="--without-ada --with-pkg-config --enable-pc-files --with-shared --enable-termcap --enable-symlinks --disable-rpath --disable-rpath-hack"
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  # Build non-wide library
+  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" $build_options
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$BLD_DIR" install
+
+  # Build wide library
+  execute make clean
+  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" $build_options --enable-widec
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$BLD_DIR" install
+  popd >/dev/null
+}
