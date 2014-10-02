@@ -28,11 +28,4 @@ echo
 
 # Clean old files
 echo "Removing old directories..."
-rm -rf ${ENV_DIR} ${PKG_DIR} ${STG_DIR} ${BLD_DIR}
-
-# Populate new structure
-echo "Populating new directory hierarchy..."
-mkdir -p ${PKG_DIR}/{stage1,stage2,stage3,stageP}
-mkdir ${ENV_DIR}
-mkdir ${STG_DIR}
-mkdir ${BLD_DIR}
+rm -rf ${ENV_DIR} ${PKG_DIR} ${STG_DIR} ${BLD_DIR} ${BUILD_DIR} ${CACHE_DIR}
