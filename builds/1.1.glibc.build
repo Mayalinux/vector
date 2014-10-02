@@ -2,6 +2,7 @@ PACKAGE_NAME="glibc-2.20"
 PACKAGE_DESCRIPTION="GNU C Library"
 PROJECT_URL="http://www.gnu.org/software/libc/"
 PACKAGE_URL="http://ftp.gnu.org/gnu/glibc/${PACKAGE_NAME}.tar.xz"
+LIBRARY=yes
 
 function build() {
   require "$PACKAGE_PATH"

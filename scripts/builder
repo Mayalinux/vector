@@ -122,6 +122,8 @@ function build() {
 
 function pack() {
   execute $(dirname "$0")/pack "$STAGE" "$PACKAGE_NAME"
+  execute $(dirname "$0")/toenv "$STAGE" "$PACKAGE_NAME"
+  [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}"
 }
 
 function info() {
@@ -130,11 +132,12 @@ function info() {
 
 # Clean output directory
 [[ ! -d "$BLD_DIR" ]] && execute mkdir -p "$BLD_DIR"
-[[ -n "$DEBUG" ]] && execute rm -rf $BLD_DIR/*
 
 # Clean build directory
 [[ ! -d "$BUILD_DIR" ]] && execute mkdir -p "$BUILD_DIR"
-[[ -n "$DEBUG" ]] && execute rm -rf $BUILD_DIR/*
+
+# Checks environment directory
+[[ ! -d "$ENV_DIR" ]] && execute mkdir -p "$ENV_DIR"
 
 # Detect kernel directory
 KERNEL_DIR="$(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1)"
@@ -158,12 +161,16 @@ case "$1" in
   download)
     download ;;
   build)
+    execute rm -rf $BUILD_DIR/*
+    execute rm -rf $BLD_DIR/*
     build ;;
   pack)
     pack ;;
   info)
     info ;;
   all)
+    execute rm -rf $BUILD_DIR/*
+    execute rm -rf $BLD_DIR/*
     download; build; pack ;;
   * | "")
     echo "WARNING: no action defined" >&2
