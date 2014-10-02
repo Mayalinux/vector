@@ -1,0 +1,20 @@
+PACKAGE_NAME="coreutils-8.23"
+PACKAGE_DESCRIPTION="Core OS utilities"
+PROJECT_URL="http://www.gnu.org/software/coreutils/"
+PACKAGE_URL="http://ftp.gnu.org/gnu/coreutils/${PACKAGE_NAME}.tar.xz"
+LIBRARY=no
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --bindir=/bin --sbindir=/sbin --libdir=/lib --sysconfdir=/etc --localstatedir=/var --without-openssl --disable-acl --disable-libsmack --disable-libcap --disable-rpath
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$BLD_DIR" install
+  popd >/dev/null
+}
