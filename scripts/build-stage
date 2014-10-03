@@ -14,7 +14,7 @@ source $(realpath $(dirname "$0"))/dirs.inc.sh
 echo "Building stage ${STAGE}..."
 
 for build in $(find "${BUILDS_DIR}" -name '*.build' -exec basename {} \; | awk '{ sub("'"^${STAGE}"'[.]([0-9]+[.])?", ""); sub("[.]build$", ""); print }'); do
-  if ! bash -c "$(dirname "$0")/builder $build all"; then
+  if ! $(dirname "$0")/builder $build all; then
     echo "Error building $build" >&2
     exit 1
   fi

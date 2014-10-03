@@ -29,3 +29,9 @@ echo
 # Clean old files
 echo "Removing old directories..."
 rm -rf ${ENV_DIR} ${PKG_DIR} ${STG_DIR} ${BLD_DIR} ${BUILD_DIR} ${CACHE_DIR}
+
+# Setup configuration files
+mkdir -p "${ENV_DIR}" >/dev/null
+pushd ${ENV_DIR}
+tar -xvf "${OTHER_DIR}/misc-config.tar.xz"
+popd >/dev/null
