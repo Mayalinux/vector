@@ -5,6 +5,9 @@ PACKAGE_URL="ftp://www.kernel.org/pub/linux/utils/util-linux/v2.25/${PACKAGE_NAM
 LIBRARY=yes
 
 function build() {
+  depends_on ncurses
+  depends_on eudev
+
   require "$PACKAGE_PATH"
 
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
@@ -17,7 +20,7 @@ function build() {
   popd >/dev/null
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --disable-rpath --bindir=/bin --sbindir=/sbin --libdir=/lib --localstatedir=/var --enable-most-builds --without-udev --with-ncurses --without-slang --without-user --without-smack --without-python 
+  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --disable-rpath --bindir=/bin --sbindir=/sbin --libdir=/lib --localstatedir=/var --enable-most-builds --with-ncurses --without-slang --without-user --without-smack --without-python 
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$BLD_DIR" install
 }

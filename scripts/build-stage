@@ -1,0 +1,22 @@
+###
+### Builds an entire stage
+###
+####
+#### Usage: build-stage {stage#}
+####
+#### stage# is the stage number (1, 2 or 3)
+####
+
+STAGE="$1"
+
+source $(realpath $(dirname "$0"))/dirs.inc.sh
+
+echo "Building stage ${STAGE}..."
+
+for build in $(find "${BUILDS_DIR}" -name '*.build' -exec basename {} \; | awk '{ sub("'"^${STAGE}"'[.]([0-9]+[.])?", ""); sub("[.]build$", ""); print }'); do
+  if ! bash -c "$(dirname "$0")/builder $build all"; then
+    echo "Error building $build" >&2
+    exit 1
+  fi
+done
+

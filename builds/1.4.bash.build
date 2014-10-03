@@ -22,6 +22,8 @@ function download() {
 }
 
 function build() {
+  depends_on readline
+
   require "$PACKAGE_PATH"
 
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
