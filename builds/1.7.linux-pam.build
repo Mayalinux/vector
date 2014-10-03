@@ -6,6 +6,8 @@ PACKAGE_URL="http://www.linux-pam.org/library/Linux-PAM-1.1.8.tar.bz2"
 LIBRARY=yes
 
 function build() {
+  depends_on flex
+
   require "$PACKAGE_PATH"
 
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
