@@ -2,6 +2,7 @@ PACKAGE_NAME="ncurses-5.9"
 PACKAGE_DESCRIPTION="Ncurses library for text based GUI"
 PROJECT_URL="https://www.gnu.org/software/ncurses/ncurses.html"
 PACKAGE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/${PACKAGE_NAME}.tar.gz"
+BUILD_FAST=yes
 LIBRARY=yes
 
 function download() {

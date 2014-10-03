@@ -2,6 +2,7 @@ PACKAGE_NAME="readline-6.3"
 PACKAGE_DESCRIPTION="Readline"
 PROJECT_URL="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html"
 PACKAGE_URL="ftp://ftp.cwru.edu/pub/bash/${PACKAGE_NAME}.tar.gz"
+BUILD_FAST=yes
 LIBRARY=yes
 
 function build() {

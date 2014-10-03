@@ -3,6 +3,7 @@ PACKAGE_DESCRIPTION="System V style init programs"
 PROJECT_URL="https://savannah.nongnu.org/projects/sysvinit"
 CACHE_EXTENSION=".tar.bz2"
 PACKAGE_URL="http://download.savannah.gnu.org/releases/sysvinit/${PACKAGE_NAME}.tar.bz2"
+BUILD_FAST=yes
 LIBRARY=no
 
 function build() {

@@ -3,6 +3,7 @@ PACKAGE_DESCRIPTION=""
 PROJECT_URL="http://savannah.nongnu.org/projects/attr"
 CACHE_EXTENSION=".tar.gz"
 PACKAGE_URL="http://download.savannah.gnu.org/releases/attr/${PACKAGE_NAME}.src.tar.gz"
+BUILD_FAST=yes
 LIBRARY=yes
 
 function build() {

@@ -9,6 +9,7 @@
 ####
 #### NOTE: Set LIBRARY=yes only if this package provides shared libraries
 #### NOTE: If CACHE_EXTENSION doesn't need to be changed, it can be removed
+#### NOTE: Set BUILD_FAST to true for small packages to build them in /tmp (this assumes /tmp is on tmpfs or such)
 ####
 
 PACKAGE_NAME=""
@@ -16,6 +17,7 @@ PACKAGE_DESCRIPTION=""
 PROJECT_URL=""
 CACHE_EXTENSION=".tar.xz"
 PACKAGE_URL=""
+BUILD_FAST=no
 LIBRARY=no
 
 function download() {

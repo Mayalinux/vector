@@ -158,9 +158,6 @@ function info() {
 # Clean output directory
 [[ ! -d "$BLD_DIR" ]] && execute mkdir -p "$BLD_DIR"
 
-# Clean build directory
-[[ ! -d "$BUILD_DIR" ]] && execute mkdir -p "$BUILD_DIR"
-
 # Checks environment directory
 [[ ! -d "$ENV_DIR" ]] && execute mkdir -p "$ENV_DIR"
 
@@ -181,12 +178,20 @@ CACHE_EXTENSION=".tar.xz"
 BUILD_FILE=$(find $BUILDS_DIR -name "*.${1}.build"); shift
 source "$BUILD_FILE"
 
+# Compute package data
 PACKAGE_FILENAME="${PACKAGE_NAME}${CACHE_EXTENSION}"
 STAGE=$(basename "$BUILD_FILE" | cut -d . -f 1)
 
 # Download location of the main package source code
 PACKAGE_PATH="${CACHE_DIR}/$PACKAGE_FILENAME"
 
+# Enable fast-build feature, if needed
+[[ "$BUILD_FAST" = yes ]] && BUILD_DIR=/tmp/build
+
+# Create build directory
+[[ ! -d "$BUILD_DIR" ]] && execute mkdir -p "$BUILD_DIR"
+
+# Check if package has already been built and exit if it has been
 package_built "$PACKAGE_NAME" && exit 0
 
 # Execute action
