@@ -3,3 +3,4 @@ pkgs/*
 build/*
 cache/*
 env/*
+*.img

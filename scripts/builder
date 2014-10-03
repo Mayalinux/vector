@@ -14,6 +14,8 @@
 ####  - info: Prints package information
 ####
 
+EXEC_PATH="$(realpath $(dirname "$0"))"
+
 source scripts/dirs.inc.sh
 
 ##
@@ -121,8 +123,8 @@ function build() {
 }
 
 function pack() {
-  execute $(dirname "$0")/pack "$STAGE" "$PACKAGE_NAME"
-  execute $(dirname "$0")/toenv "$STAGE" "$PACKAGE_NAME"
+  execute "$EXEC_PATH/pack" "$STAGE" "$PACKAGE_NAME"
+  execute "$EXEC_PATH/toenv" "$STAGE" "$PACKAGE_NAME"
   [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}"
 }
 
