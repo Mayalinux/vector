@@ -1,1 +1,4 @@
 file /init ../env/bin/bash 755 0 0
+
+dir /dev 755 0 0
+nod /dev/console 600 0 0 c 5 1
