@@ -11,7 +11,7 @@ source $(dirname "$0")/dirs.inc.sh
 
 exec 3>$(dirname "$0")/../linux-*/cpio-mayal.txt
 
-ldconfig -r "$INITRAMFS_DIR" /lib /lib64
+ldconfig -r "$INITRAMFS_DIR" /lib /lib64 /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64
 
 for f in $(find "$INITRAMFS_DIR" -type d | tail -n +2); do
   dirpath=$(echo "$f" | awk "{ sub(\"$INITRAMFS_DIR\", \"\"); print }")
