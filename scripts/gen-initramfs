@@ -7,8 +7,9 @@
 #### Usage: gen-initramfs
 ####
 
-# Source files are hard-linked, not copied, thus MUST NOT be modified
-sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo lib64/libc-2.20.so lib/libuuid.so.1.3.0 lib/libmount.so.1.1.0 lib/libattr.so.1 usr/lib/libncursesw.so.5.9 lib/libblkid.so.1.1.0 sbin/switch_root sbin/pivot_root lib64/ld-linux-x86-64.so.2 lib64/libdl-2.20.so)
+# Source files are hard-linked, not copied, thus MUST NOT be modified in initramfs directory
+sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root sbin/pivot_root) 
+shared_libraries=(libc libuuid libmount libattr libncursesw libblkid ld libdl)
 
 source $(dirname "$0")/dirs.inc.sh
 
@@ -20,12 +21,22 @@ pushd "$INITRAMFS_DIR" >/dev/null
 rm -rf *
 
 mkdir -p etc bin sbin lib usr/lib usr/local/lib
+
 ln -s lib lib64
-ln -s lib usr/lib64
-ln -s lib usr/local/lib64
+ln -s ../lib usr/lib
+ln -s ../lib usr/lib64
+ln -s ../../lib usr/local/lib
+ln -s ../../lib usr/local/lib64
 
 for f in ${sources[*]}; do
   cp -l "$ENV_DIR/$f" "$INITRAMFS_DIR/$f"
+done
+
+for slib in ${shared_libraries[*]}; do
+  if ! cp -l $(find $ENV_DIR/{lib,lib64,/usr/lib,/usr/lib64} -name "$slib*.so*" -type f -perm /700 -printf "%p " 2>/dev/null) "$INITRAMFS_DIR/lib/" 2>/dev/null; then
+    echo "Error while copying library $slib" >&2
+    exit 1
+  fi
 done
 
 popd >/dev/null
