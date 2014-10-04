@@ -54,7 +54,7 @@ generate the initramfs before attempting to boot the kernel or you might end up
 with a kernel panic.
 
 # About the project
-This is just a projcet I'm mainly working on for myself. It's nerd stuff not
+This is just a project I'm mainly working on for myself. It's nerd stuff not
 meant to be user-friendly, not meant to be a distro or an alternative to
 anything. Nevertheless, if you get this to work and have something to say about
 it, I appreciate any feedback.

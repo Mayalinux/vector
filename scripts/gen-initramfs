@@ -46,4 +46,21 @@ if ! $(dirname "$0")/gen-cpio-index; then
   exit 1
 fi
 
-make -C $(find $(dirname "$0")/../ -maxdepth 1 -name 'linux-*' -type d)
+KNAME="$(find $(dirname "$0")/../ -maxdepth 1 -name 'linux-*' -type d -printf '%f')"
+PKG_NAME="$PKG_DIR/stage1/${KNAME}.tar.xz" 
+KPKGNAME="$(basename $(tar -tf $PKG_NAME | grep boot/ | grep vmlinuz-))"
+
+if ! make -C "$(dirname "$0")/../$KNAME"; then
+  echo "ERROR: make did not succeed" >&2
+  exit 1
+fi
+
+rm -rf $BUILD_DIR/* && \
+  mkdir -p "$BUILD_DIR/boot" && \
+  cp -l "$(dirname "$0")/../$KNAME/arch/x86/boot/bzImage" "$BUILD_DIR/boot/$KPKGNAME" && \
+
+  rm -f "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" && \
+  xz --decompress "$PKG_NAME" && rm -f "$PKG_NAME" && \
+  tar -uf "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" "$BUILD_DIR/boot/$KPKGNAME" && \
+  xz "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" && \
+  $(dirname "$0")/toenv 1 "$KNAME"
