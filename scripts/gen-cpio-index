@@ -1,0 +1,57 @@
+#!/bin/bash
+
+###
+### CPIO index generator
+###
+####
+#### Usage: gen-cpio-index
+####
+
+source $(dirname "$0")/dirs.inc.sh
+
+exec 3>$(dirname "$0")/../linux-*/cpio-mayal.txt
+
+ldconfig -r "$INITRAMFS_DIR" /lib /lib64
+
+for f in $(find "$INITRAMFS_DIR" -type d | tail -n +2); do
+  dirpath=$(echo "$f" | awk "{ sub(\"$INITRAMFS_DIR\", \"\"); print }")
+
+  echo "dir $dirpath 755 0 0" >&3
+done
+
+echo "dir /dev 755 0 0" >&3
+echo >&3
+
+for f in $(find "$INITRAMFS_DIR" -type f); do
+  fpath=$(echo "$f" | awk "{ sub(\"$INITRAMFS_DIR\", \"\"); print }")
+
+  echo "file $fpath $(realpath "$f") $(stat --printf="%a" "$f") 0 0" >&3
+done
+
+for f in $(find "$INITRAMFS_DIR" -type l); do
+  lpath=$(echo "$f" | awk "{ sub(\"$INITRAMFS_DIR\", \"\"); print }")
+  
+  echo "slink $lpath $(readlink $f) $(stat --printf="%a" "$f") 0 0" >&3
+done
+
+echo "slink /init /bin/bash 777 0 0" >&3
+echo >&3
+
+# Console
+echo "nod /dev/console 600 0 0 c 5 1" >&3
+
+# SCSI devices
+dev_type=b
+dev_major=8
+dev_minor=0
+while [[ $dev_minor -lt 256 ]]; do
+  if [[ $(($dev_minor%16)) -eq 0 ]]; then
+    echo "nod /dev/sd$(awk "BEGIN { printf \"%c\", $(($dev_minor/16+97)) }") 600 0 0 $dev_type $dev_major $dev_minor" >&3
+  else
+    echo "nod /dev/sd$(awk "BEGIN { printf \"%c\", $(($dev_minor/16+97)) }")$(($dev_minor%16)) 600 0 0 $dev_type $dev_major $dev_minor" >&3
+  fi
+
+  dev_minor=$(($dev_minor+1))
+done
+
+exec 3>&-

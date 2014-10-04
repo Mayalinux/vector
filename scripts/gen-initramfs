@@ -1,0 +1,26 @@
+#!/bin/bash
+
+###
+### Initramfs generator
+###
+####
+#### Usage: gen-initramfs
+####
+
+sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo lib/libc-2.20.so lib/libuuid.so.1.3.0 lib/libmount.so.1.1.0 lib/libattr.so.1 lib/libncursesw.so.5.9 lib/libblkid.so.1.1.0 sbin/switch_root sbin/pivot_root lib64/ld-linux-x86-64.so.2 lib64/libdl-2.20.so)
+
+source $(dirname "$0")/dirs.inc.sh
+
+[[ ! -d "$INITRAMFS_DIR" ]] && echo "ERROR: initramfs directory not found." >&2 && exit 1
+
+pushd "$INITRAMFS_DIR" >/dev/null
+rm -rf *
+
+mkdir -p etc bin sbin lib
+ln -s lib lib64
+
+for f in ${sources[*]}; do
+  cp "$ENV_DIR/$f" "$INITRAMFS_DIR/$f"
+done
+
+popd >/dev/null

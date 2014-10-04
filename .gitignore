@@ -1,3 +1,4 @@
+initramfs/*
 pkgs/*
 /linux*
 build/*

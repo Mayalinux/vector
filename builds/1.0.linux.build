@@ -12,7 +12,7 @@ function build() {
   local KDIR="./$PACKAGE_NAME"
 
   execute cp "$OTHER_DIR/linux-config" "$KDIR/.config"
-  execute cp "$OTHER_DIR/cpio-mayal.txt" "$KDIR/"
+  execute touch "$KDIR/cpio-mayal.txt"
 
   execute make -C "$KDIR" -j$(($N_CPUS+1)) all
   execute make -C "$KDIR" INSTALL_MOD_PATH="$BLD_DIR" modules_install
@@ -24,7 +24,6 @@ function build() {
   execute mkdir -p "$BLD_DIR/boot"
   execute cp "$kimg" "$BLD_DIR/boot/$vmlinuz"
   execute cp "$KDIR/System.map" "$BLD_DIR/boot/"
-  execute cp "$KDIR/.config" "$BLD_DIR/boot/linux-config"
 
   pushd "$BLD_DIR/boot" >/dev/null
   execute ln -s "$vmlinuz" vmlinuz

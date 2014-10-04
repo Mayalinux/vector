@@ -42,3 +42,7 @@ PATCH_DIR=$(realpath $(dirname "$0"))/../patches
 # This directory contains any other file that isn't suitable to be contained
 # in one of the other directories
 OTHER_DIR=$(realpath $(dirname "$0"))/../other
+
+# Initramfs directory
+# This directory contains the files that will be added to the initramfs
+INITRAMFS_DIR=$(realpath $(dirname "$0"))/../initramfs
