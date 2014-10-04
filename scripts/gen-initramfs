@@ -8,8 +8,8 @@
 ####
 
 # Source files are hard-linked, not copied, thus MUST NOT be modified in initramfs directory
-sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root sbin/pivot_root) 
-shared_libraries=(libc libuuid libmount libattr libncursesw libblkid ld libdl)
+sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root sbin/pivot_root usr/bin/kmod) 
+shared_libraries=(libc libuuid libmount libattr libncursesw libblkid ld libdl libkmod)
 
 source $(dirname "$0")/dirs.inc.sh
 
@@ -20,7 +20,7 @@ $(dirname "$0")/build-stage 1
 pushd "$INITRAMFS_DIR" >/dev/null
 rm -rf *
 
-mkdir -p etc bin sbin lib usr/lib usr/local/lib
+mkdir -p etc bin sbin lib usr/lib usr/local/lib usr/bin
 
 ln -s lib lib64
 ln -s ../lib usr/lib
