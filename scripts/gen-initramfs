@@ -8,8 +8,8 @@
 ####
 
 # Source files are hard-linked, not copied, thus MUST NOT be modified in initramfs directory
-sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root sbin/pivot_root usr/bin/kmod) 
-shared_libraries=(libc libuuid libmount libattr libncursesw libblkid ld libdl libkmod)
+sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root sbin/pivot_root) 
+shared_libraries=(libc libuuid libmount libattr libncursesw libblkid ld libdl)
 
 source $(dirname "$0")/dirs.inc.sh
 
@@ -20,13 +20,11 @@ $(dirname "$0")/build-stage 1
 pushd "$INITRAMFS_DIR" >/dev/null
 rm -rf *
 
-mkdir -p etc bin sbin lib usr/lib usr/local/lib usr/bin
+mkdir -p etc bin sbin lib usr/{bin,sbin}
 
 ln -s lib lib64
 ln -s ../lib usr/lib
 ln -s ../lib usr/lib64
-ln -s ../../lib usr/local/lib
-ln -s ../../lib usr/local/lib64
 
 for f in ${sources[*]}; do
   cp -l "$ENV_DIR/$f" "$INITRAMFS_DIR/$f"
@@ -61,6 +59,9 @@ rm -rf $BUILD_DIR/* && \
 
   rm -f "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" && \
   xz --decompress "$PKG_NAME" && rm -f "$PKG_NAME" && \
-  tar -uf "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" "$BUILD_DIR/boot/$KPKGNAME" && \
+  pushd "$BUILD_DIR" >/dev/null && \
+  tar --delete -f "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" "boot/$KPKGNAME" && \
+  tar -uf "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" "boot/$KPKGNAME" && \
+  popd >/dev/null && \
   xz "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" && \
   $(dirname "$0")/toenv 1 "$KNAME"

@@ -1,0 +1,29 @@
+PACKAGE_NAME="syslinux-config"
+PACKAGE_DESCRIPTION="Syslinux booloader configuration file"
+PROJECT_URL="http://www.syslinux.org"
+PACKAGE_URL=""
+BUILD_FAST=yes
+LIBRARY=no
+
+function download() { true; }
+
+function build() {
+  local SYSL_DIR="$BLD_DIR/boot/syslinux"
+  local SYSL_CONFIG="$SYSL_DIR/syslinux.cfg"
+  local KNL="$(find $(dirname "$0")/.. -maxdepth 1 -name 'linux-*' -type d -printf '%f')"
+  local PKGKNL=$(tar -tf "$PKG_DIR/stage1/${KNL}.tar.xz" | grep boot | grep vmlinuz-)
+
+  mkdir -p "$SYSL_DIR"
+  echo "$KNL"
+  echo "$PKGKNL"
+  echo "$SYSL_CONFIG"
+
+  cat >"$SYSL_CONFIG" <<EOF
+DEFAULT vector
+
+LABEL vector
+  SAY Booting vector...
+  KERNEL $PKGKNL
+  APPEND loglevel=7
+EOF
+}
