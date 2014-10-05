@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ###
 ### Builds an entire stage
 ###
@@ -13,7 +15,7 @@ source $(realpath $(dirname "$0"))/dirs.inc.sh
 
 echo "Building stage ${STAGE}..."
 
-for build in $(find "${BUILDS_DIR}" -name '*.build' -exec basename {} \; | cut -d . -f 1 --complement | sort -g | awk '{ sub("([0-9]+[.])?", ""); sub("[.]build$", ""); print }'); do
+for build in $(find "${BUILDS_DIR}" -name "${STAGE}.*.build" -exec basename {} \; | cut -d . -f 1 --complement | sort -g | awk '{ sub("([0-9]+[.])?", ""); sub("[.]build$", ""); print }'); do
   if ! $(dirname "$0")/builder $build all; then
     echo "Error building $build" >&2
     exit 1

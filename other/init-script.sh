@@ -2,16 +2,14 @@
 
 export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
 
-exec /bin/bash
-
 mount -t devtmpfs none /dev
 mkdir -p /dev/{shm,pts}
 
-mount -t proc none /proc
-mount -t tmpfs none /run
-mount -t tmpfs none /dev/shm
-mount -t devpts none /dev/pts
-
-echo TEST!
+mount -t proc proc /proc
+mount -t tmpfs run /run
+mount -t tmpfs devshm /dev/shm
+mount -t devpts devpts /dev/pts
+mount -t syfs sys /sys
+mount -t tmpfs cgroup_root /sys/fs/cgroup
 
 exec /bin/bash
