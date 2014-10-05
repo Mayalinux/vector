@@ -37,7 +37,7 @@ for f in $(find "$INITRAMFS_DIR" -type l); do
   echo "slink $lpath $(readlink $f) $(stat --printf="%a" "$f") 0 0" >&3
 done
 
-echo "file /init $OTHER_DIR/init-script.sh 744 0 0"
+echo "file /init $OTHER_DIR/init-script.sh 744 0 0" >&3
 echo >&3
 
 # Console

@@ -1,7 +1,7 @@
 PACKAGE_NAME="kmod-18"
 PACKAGE_DESCRIPTION="Linux kernel module utilities"
 PROJECT_URL="https://www.kernel.org"
-PACKAGE_URL="ftp://www.kernel.org/pub/linux/utils/kernel/kmod/${PACKAGE_NAME}.tar.xz"
+PACKAGE_URL="https://www.kernel.org/pub/linux/utils/kernel/kmod/${PACKAGE_NAME}.tar.xz"
 BUILD_FAST=yes
 LIBRARY=yes
 
