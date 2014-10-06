@@ -29,7 +29,7 @@ DST_DIR=$1
 #
 # $1 is the stage number
 function copyStage() {
-	local STG_DIR=${PKG_DIR}/stage${1}
+	local STG_DIR=${STAGES_DIR}/stage${1}
 
 	[[ ! -d "$STG_DIR" ]] && echo "ERROR: stage directory <${STG_DIR}> does not exist" >&2 && exit 2
 

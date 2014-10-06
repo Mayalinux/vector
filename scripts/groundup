@@ -28,7 +28,7 @@ echo
 
 # Clean old files
 echo "Removing old directories..."
-rm -rf ${ENV_DIR} ${PKG_DIR} ${STG_DIR} ${BLD_DIR} ${BUILD_DIR} ${CACHE_DIR}
+rm -rf ${ENV_DIR} ${STAGES_DIR} ${STG_DIR} ${INSTALL_DIR} ${BUILD_DIR} ${CACHE_DIR}
 
 # Setup configuration files
 mkdir -p "${ENV_DIR}" >/dev/null

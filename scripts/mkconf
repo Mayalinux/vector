@@ -13,8 +13,8 @@ source $(dirname "$0")/dirs.inc.sh
 exec 3>/dev/null
 
 # Check environment
-[[ ! -d "$BLD_DIR" ]] && echo "ERROR: Packaging directory <${BLD_DIR}> does not exist" >&2 && exit 1
+[[ ! -d "$INSTALL_DIR" ]] && echo "ERROR: Packaging directory <${INSTALL_DIR}> does not exist" >&2 && exit 1
 
-pushd $BLD_DIR >&3
-tar xvf $PKG_DIR/stageP/misc-config.tar.xz
+pushd $INSTALL_DIR >&3
+tar xvf $STAGES_DIR/stageP/misc-config.tar.xz
 popd >&3

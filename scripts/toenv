@@ -25,7 +25,7 @@ PKG="$2"
 
 # Set package file
 PKG_FILE="${PKG}.tar.xz"
-PKG_PATH="${PKG_DIR}/stage${STAGE}/${PKG_FILE}"
+PKG_PATH="${STAGES_DIR}/stage${STAGE}/${PKG_FILE}"
 
 # Check environment
 [[ ! -d "${ENV_DIR}" ]] && echo "ERROR: environment directory <${ENV_DIR}> does not exist" && exit 1

@@ -8,10 +8,10 @@ LIBRARY=no
 function download() { true; }
 
 function build() {
-  local SYSL_DIR="$BLD_DIR/boot/syslinux"
+  local SYSL_DIR="$INSTALL_DIR/boot/syslinux"
   local SYSL_CONFIG="$SYSL_DIR/syslinux.cfg"
   local KNL="$(find $(dirname "$0")/.. -maxdepth 1 -name 'linux-*' -type d -printf '%f')"
-  local PKGKNL="/$(tar -tf "$PKG_DIR/stage1/${KNL}.tar.xz" | grep boot | grep vmlinuz-)"
+  local PKGKNL="/$(tar -tf "$STAGES_DIR/stage1/${KNL}.tar.xz" | grep boot | grep vmlinuz-)"
 
   mkdir -p "$SYSL_DIR"
 

@@ -17,5 +17,5 @@ function build() {
   assert_last
   popd >/dev/null
   execute make -C "$BDIR" -j$(($N_CPUS+1))
-  execute make -C "$BDIR" install_root="$BLD_DIR" install
+  execute make -C "$BDIR" install_root="$INSTALL_DIR" install
 }

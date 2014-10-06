@@ -13,7 +13,7 @@ function build() {
 
   pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
   execute make
-  make ROOT="$BLD_DIR" install
+  make ROOT="$INSTALL_DIR" install
   assert_last
   popd >/dev/null
 }

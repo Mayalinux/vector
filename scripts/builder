@@ -76,7 +76,7 @@ function package_built() {
   local dep_name="$1"
   local dep_file="${dep_name}.tar.xz"
 
-  test -f "$PKG_DIR/stage$STAGE/$dep_file"
+  test -f "$STAGES_DIR/stage$STAGE/$dep_file"
 }
 
 ##
@@ -168,13 +168,13 @@ function info() {
 [[ ! -d "$CACHE_DIR" ]] && execute mkdir -p "$CACHE_DIR"
 
 # Clean output directory
-[[ ! -d "$BLD_DIR" ]] && execute mkdir -p "$BLD_DIR"
+[[ ! -d "$INSTALL_DIR" ]] && execute mkdir -p "$INSTALL_DIR"
 
 # Checks environment directory
 [[ ! -d "$ENV_DIR" ]] && execute mkdir -p "$ENV_DIR"
 
 # Checks stage directory
-for dir in $PKG_DIR/stage{1,2,3,P}; do [[ ! -d "$dir" ]] && mkdir -p "$dir"; done
+for dir in $STAGES_DIR/stage{1,2,3,P}; do [[ ! -d "$dir" ]] && mkdir -p "$dir"; done
 
 # Detect kernel directory
 KERNEL_DIR="$(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1)"
@@ -212,7 +212,7 @@ case "$1" in
     download ;;
   build)
     execute rm -rf $BUILD_DIR/*
-    execute rm -rf $BLD_DIR/*
+    execute rm -rf $INSTALL_DIR/*
     build ;;
   pack)
     pack ;;
@@ -220,7 +220,7 @@ case "$1" in
     info ;;
   all)
     execute rm -rf $BUILD_DIR/*
-    execute rm -rf $BLD_DIR/*
+    execute rm -rf $INSTALL_DIR/*
     download; build; pack ;;
   * | "")
     echo "WARNING: no action defined" >&2

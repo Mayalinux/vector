@@ -45,7 +45,7 @@ if ! $(dirname "$0")/gen-cpio-index; then
 fi
 
 KNAME="$(find $(dirname "$0")/../ -maxdepth 1 -name 'linux-*' -type d -printf '%f')"
-PKG_NAME="$PKG_DIR/stage1/${KNAME}.tar.xz" 
+PKG_NAME="$STAGES_DIR/stage1/${KNAME}.tar.xz" 
 KPKGNAME="$(basename $(tar -tf $PKG_NAME | grep boot/ | grep vmlinuz-))"
 
 if ! make -C "$(dirname "$0")/../$KNAME"; then

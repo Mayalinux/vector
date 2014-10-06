@@ -17,6 +17,6 @@ function build() {
   ./configure CFLAGS="-O2 -I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-darwin --disable-selinux --disable-xsmp --disable-xsmp-interact --disable-netbeans --enable-multibyte --enable-gui=no --disable-gpm --disable-sysmouse --without-x --disable-acl
   assert_last
   execute make -j$(($N_CPUS+1))
-  execute make DESTDIR="$BLD_DIR" install
+  execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null
 }

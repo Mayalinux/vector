@@ -18,10 +18,10 @@ exec 3>/dev/null
 # Set args
 STAGE=$1
 PKG_NAME=$2
-STAGE_DIR="${PKG_DIR}/stage${STAGE}"
+STAGE_DIR="${STAGES_DIR}/stage${STAGE}"
 
 # Check environment
-[[ ! -d "$BLD_DIR" ]] && echo "ERROR: Packaging directory <${BLD_DIR}> does not exist" >&2 && exit 1
+[[ ! -d "$INSTALL_DIR" ]] && echo "ERROR: Packaging directory <${INSTALL_DIR}> does not exist" >&2 && exit 1
 [[ ! -d "$STAGE_DIR" ]] && echo "ERROR: Stage directory <${STAGE_DIR}> does not exist" >&2 && exit 1
 
 # Check args
@@ -45,19 +45,19 @@ echo "Creating package ${PKG_FILE}:"
 # Compress package
 echo "- Compressing..."
 
-pushd "${BLD_DIR}" >&3
+pushd "${INSTALL_DIR}" >&3
 (tar --recursion -cJvf "$PKG_PATH" * | awk '{ print ">> " $0; }') || (echo "ERROR: Unable to create compressed tarball" >&2 && exit 2)
 popd >&3
 
 echo
 # Display size stats
 echo -n "- * Original size: "
-du -h "$BLD_DIR" | tail -n 1 | awk '{ print $1; }'
+du -h "$INSTALL_DIR" | tail -n 1 | awk '{ print $1; }'
 echo -n "- * Packed size: "
 du -h "$PKG_PATH" | awk '{ print $1; }'
 
 echo
 # Clean-up
 echo "- Cleaning up..."
-rm -rf ${BLD_DIR}/*
+rm -rf ${INSTALL_DIR}/*
 

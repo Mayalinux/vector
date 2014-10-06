@@ -17,9 +17,9 @@ function build() {
   ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc
   assert_last
   execute make -j$(($N_CPUS+1))
-  execute make DESTDIR="$BLD_DIR" install
-  mkdir -p $BLD_DIR/sbin
-  pushd "$BLD_DIR/usr/bin" >/dev/null
+  execute make DESTDIR="$INSTALL_DIR" install
+  mkdir -p $INSTALL_DIR/sbin
+  pushd "$INSTALL_DIR/usr/bin" >/dev/null
   local links=(insmod rmmod modprobe lsmod modinfo depmod)
 
   for link in ${links[*]}; do
@@ -27,9 +27,9 @@ function build() {
   done
   popd >/dev/null
 
-  cp -l "$BLD_DIR/usr/bin/kmod" "$BLD_DIR/sbin/kmod"
+  cp -l "$INSTALL_DIR/usr/bin/kmod" "$INSTALL_DIR/sbin/kmod"
 
-  pushd "$BLD_DIR/sbin" >/dev/null
+  pushd "$INSTALL_DIR/sbin" >/dev/null
   for link in ${links[*]}; do
     ln -s kmod $link
   done

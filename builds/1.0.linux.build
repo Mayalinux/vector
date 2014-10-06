@@ -15,17 +15,17 @@ function build() {
   execute touch "$KDIR/cpio-mayal.txt"
 
   execute make -C "$KDIR" -j$(($N_CPUS+1)) all
-  execute make -C "$KDIR" INSTALL_MOD_PATH="$BLD_DIR" modules_install
+  execute make -C "$KDIR" INSTALL_MOD_PATH="$INSTALL_DIR" modules_install
   execute make -C "$KDIR" headers_install
 
   local kimg="$KDIR/arch/x86/boot/bzImage"
   local vmlinuz="vmlinuz-$(echo "$PACKAGE_NAME" | cut -d - -f 2)-mayal"
 
-  execute mkdir -p "$BLD_DIR/boot"
-  execute cp "$kimg" "$BLD_DIR/boot/$vmlinuz"
-  execute cp "$KDIR/System.map" "$BLD_DIR/boot/"
+  execute mkdir -p "$INSTALL_DIR/boot"
+  execute cp "$kimg" "$INSTALL_DIR/boot/$vmlinuz"
+  execute cp "$KDIR/System.map" "$INSTALL_DIR/boot/"
 
-  pushd "$BLD_DIR/boot" >/dev/null
+  pushd "$INSTALL_DIR/boot" >/dev/null
   execute ln -s "$vmlinuz" vmlinuz
   popd >/dev/null
 }
