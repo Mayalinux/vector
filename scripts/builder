@@ -116,7 +116,19 @@ function extract_tar() {
 }
 
 ##
-## Executes a command and checks its exits 0.
+## Exits if the last command called immediately before has failed.
+##
+## Usage: assert_last
+##
+function assert_last() {
+  [[ $? -ne 0 ]] && echo "Last command returned $?" && exit 1
+}
+
+##
+## Executes a command and checks its exit value is 0.
+## Do not use 'execute' with commands taking complex parameters
+## such as CFLAGS="-O2 -I." because there might be errors in
+## parameter interpretation. Use assert_last in this cases.
 ##
 ## Usage: execute command [arg [...]]
 ##

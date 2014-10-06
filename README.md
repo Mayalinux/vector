@@ -11,12 +11,13 @@ The project is divided into a number of stages:
 1. The system can boot-up, displaying a shell and basic operation can be
    performed (copy, move, delete, mount, etc...).
 
-2. The system can edit text files and has connectivity (ethernet, WEP, WPA)
-   via static or dynamic IP (DHCP). A text-based browser is also provided along
-   with at least a ping tool and curl.
+2. The system has full local operational capabilities. It supports C/C++
+   compilation, GNU make, autoconf and other basic build tools. It also supports
+   text editing and encryption features.
 
-3. The system has basic compilation support for C/C++ along with some best known
-   build tools.
+3. The system supports ethernet and wireless (WEP/WPA) connectivity, both static
+   and dynamic (DHCP), text-based web browsing and other basic network-related
+   features.
 
 Each stage implements the previous and the vector system can be generated in
 whichever stage the user wants.

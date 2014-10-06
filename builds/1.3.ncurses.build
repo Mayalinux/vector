@@ -1,7 +1,8 @@
 PACKAGE_NAME="ncurses-5.9"
 PACKAGE_DESCRIPTION="Ncurses library for text based GUI"
 PROJECT_URL="https://www.gnu.org/software/ncurses/ncurses.html"
-PACKAGE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/${PACKAGE_NAME}.tar.gz"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/${PACKAGE_NAME}${CACHE_EXTENSION}"
 BUILD_FAST=yes
 LIBRARY=yes
 
@@ -26,7 +27,8 @@ function build() {
 
   # Build wide library
   execute make clean
-  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" $build_options --enable-widec
+  ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" $build_options --enable-widec
+  assert_last
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$BLD_DIR" install
   popd >/dev/null

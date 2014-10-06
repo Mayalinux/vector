@@ -2,7 +2,7 @@ PACKAGE_NAME="Linux-PAM-1.1.8"
 PACKAGE_DESCRIPTION="Linux Pluggable Authentication Modules"
 PROJECT_URL="http://www.linux-pam.org/"
 CACHE_EXTENSION=".tar.bz2"
-PACKAGE_URL="http://www.linux-pam.org/library/Linux-PAM-1.1.8.tar.bz2"
+PACKAGE_URL="http://www.linux-pam.org/library/${PACKAGE_NAME}${CACHE_EXTENSION}"
 LIBRARY=yes
 
 function build() {
@@ -16,8 +16,10 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" LDFLAGS="-L$ENV_DIR/usr/lib" --prefix=/usr --localstatedir=/var --sysconfdir=/etc --disable-rpath
+  ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" LDFLAGS="-L$ENV_DIR/usr/lib" --prefix=/usr --localstatedir=/var --sysconfdir=/etc --disable-rpath
+  assert_last
   execute make -j$(($N_CPUS+1))
-  execute make DESTDIR="$BLD_DIR" install
+  make DESTDIR="$BLD_DIR" install
+  assert_last
   popd >/dev/null
 }

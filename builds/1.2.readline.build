@@ -1,7 +1,8 @@
 PACKAGE_NAME="readline-6.3"
 PACKAGE_DESCRIPTION="Readline"
 PROJECT_URL="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html"
-PACKAGE_URL="ftp://ftp.cwru.edu/pub/bash/${PACKAGE_NAME}.tar.gz"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="ftp://ftp.cwru.edu/pub/bash/${PACKAGE_NAME}${CACHE_EXTENSION}"
 BUILD_FAST=yes
 LIBRARY=yes
 
@@ -14,8 +15,8 @@ function build() {
   execute mkdir "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/./configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-curses
-
+  ../$PACKAGE_NAME/./configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-curses
+  assert_last
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$BLD_DIR" install
 
