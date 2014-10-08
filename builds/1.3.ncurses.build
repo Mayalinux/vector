@@ -1,7 +1,9 @@
-PACKAGE_NAME="ncurses-5.9"
+PACKAGE_VERSION="5.9"
+PACKAGE_NAME="ncurses-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Ncurses library for text based GUI"
 PROJECT_URL="https://www.gnu.org/software/ncurses/ncurses.html"
 CACHE_EXTENSION=".tar.gz"
+UPDATE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/"
 PACKAGE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/${PACKAGE_NAME}${CACHE_EXTENSION}"
 BUILD_FAST=yes
 LIBRARY=yes
@@ -32,4 +34,16 @@ function build() {
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -s --connect-timeout 10 "$UPDATE_URL/" | awk '/ncurses/ { sub("ncurses", "", $9); print $9; } // {}' | grep '.*\.tar\.gz$' | grep -v doc | sed -e "s/\.tar\.gz$//" -e "s/^-//" | sort -V | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "Newer version $ver detected"
+    exit 2
+  fi
 }

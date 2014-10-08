@@ -1,7 +1,9 @@
-PACKAGE_NAME="bash-4.3"
+PACKAGE_VERSION="4.3"
+PACKAGE_NAME="bash-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Bourn Again Shell"
 PROJECT_URL="http://www.gnu.org/software/bash/"
 CACHE_EXTENSION=".tar.gz"
+UPDATE_URL="ftp://ftp.cwru.edu/pub/bash/"
 PACKAGE_URL="ftp://ftp.gnu.org/gnu/bash/${PACKAGE_NAME}${CACHE_EXTENSION}"
 LIBRARY=no
 
@@ -57,4 +59,16 @@ function build() {
   pushd "$INSTALL_DIR/bin" >/dev/null
   execute ln -s bash sh
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -s --connect-timeout 10 "$UPDATE_URL/" | awk '/bash/ { sub("bash", "", $9); print $9; } // {}' | grep '.*\.tar\.gz$' | grep -v doc | sed -e "s/\.tar\.gz$//" -e "s/^-//" | sort -V | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "Newer version $ver detected"
+    exit 2
+  fi
 }

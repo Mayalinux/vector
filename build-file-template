@@ -10,9 +10,12 @@
 #### NOTE: Set LIBRARY=yes only if this package provides shared libraries
 #### NOTE: If CACHE_EXTENSION doesn't need to be changed, it can be removed
 #### NOTE: Set BUILD_FAST to true for small packages to build them in /tmp (this assumes /tmp is on tmpfs or such)
+#### NOTE: You may add a check_latest() function that checks if the build file is up to date
+#### NOTE: You may add an info() function to customize the 'info' command output of the builder
 ####
 
-PACKAGE_NAME=""
+PACKAGE_VERSION=""
+PACKAGE_NAME="${PACKAGE_VERSION}"
 PACKAGE_DESCRIPTION=""
 PROJECT_URL=""
 CACHE_EXTENSION=".tar.xz"
@@ -43,8 +46,4 @@ function pack() {
   execute $(dirname "$0")/pack "$STAGE" "$PACKAGE_NAME"
   execute $(dirname "$0")/toenv "$STAGE" "$PACKAGE_NAME"
   [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}"
-}
-
-function info() {
-  echo -e "$PACKAGE_NAME: $PACKAGE_DESCRIPTION\n\t$PROJECT_URL\n"
 }

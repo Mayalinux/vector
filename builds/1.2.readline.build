@@ -1,8 +1,10 @@
-PACKAGE_NAME="readline-6.3"
+PACKAGE_VERSION="6.3"
+PACKAGE_NAME="readline-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Readline"
 PROJECT_URL="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html"
 CACHE_EXTENSION=".tar.gz"
 PACKAGE_URL="ftp://ftp.cwru.edu/pub/bash/${PACKAGE_NAME}${CACHE_EXTENSION}"
+UPDATE_URL="ftp://ftp.cwru.edu/pub/bash/"
 BUILD_FAST=yes
 LIBRARY=yes
 
@@ -21,4 +23,16 @@ function build() {
   execute make DESTDIR="$INSTALL_DIR" install
 
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -s --connect-timeout 10 "$UPDATE_URL/" | awk '/readline/ { sub("readline", "", $9); print $9; } // {}' | grep '.*\.tar\.gz$' | grep -v doc | sed -e "s/\.tar\.gz$//" -e "s/^-//" | sort -V | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "Newer version $ver detected"
+    exit 2
+  fi
 }
