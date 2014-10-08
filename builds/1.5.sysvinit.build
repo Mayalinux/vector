@@ -1,7 +1,9 @@
-PACKAGE_NAME="sysvinit-2.88dsf"
+PACKAGE_VERSION="2.88dsf"
+PACKAGE_NAME="sysvinit-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="System V style init programs"
 PROJECT_URL="https://savannah.nongnu.org/projects/sysvinit"
 CACHE_EXTENSION=".tar.bz2"
+UPDATE_URL="http://download.savannah.gnu.org/releases/sysvinit/"
 PACKAGE_URL="http://download.savannah.gnu.org/releases/sysvinit/${PACKAGE_NAME}${CACHE_EXTENSION}"
 BUILD_FAST=yes
 LIBRARY=no
@@ -16,4 +18,16 @@ function build() {
   make ROOT="$INSTALL_DIR" install
   assert_last
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -L -s --connect-timeout 10 "$UPDATE_URL" | egrep -o "sysvinit-([a-z0-9.]|-)+\.tar\.bz2" | grep -v "latest" | sed -e "s/sysvinit-//" -e "s/\.tar\.bz2//" | sort -V -u)
+  
+  if [[ "$ver" != "$PACKAGE_VERSION" ]]; then
+    echo "New version $ver detected"
+    exit 2
+  else
+    echo "Package up to date"
+    exit 0
+  fi
 }
