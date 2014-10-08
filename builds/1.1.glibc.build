@@ -1,4 +1,5 @@
-PACKAGE_NAME="glibc-2.20"
+PACKAGE_VERSION="2.20"
+PACKAGE_NAME="glibc-${PACKAGE_VERSION}"
 PACKAGE_DESCRIPTION="GNU C Library"
 PROJECT_URL="http://www.gnu.org/software/libc/"
 PACKAGE_URL="http://ftp.gnu.org/gnu/glibc/${PACKAGE_NAME}.tar.xz"
@@ -18,4 +19,17 @@ function build() {
   popd >/dev/null
   execute make -C "$BDIR" -j$(($N_CPUS+1))
   execute make -C "$BDIR" install_root="$INSTALL_DIR" install
+}
+
+function check_latest() {
+  ver=$(curl -s -L "$PROJECT_URL" | grep "The current stable version of glibc is" | grep -o '\([0-9]\+\.\)\+')
+  ver=${ver:0:-1}
+
+  if [[ "$ver" != "$PACKAGE_VERSION" ]]; then
+    echo "Newer version $ver detected"
+    exit 2
+  else
+    echo "Package up to date"
+    exit 0
+  fi
 }

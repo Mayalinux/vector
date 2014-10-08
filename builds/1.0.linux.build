@@ -1,4 +1,5 @@
-PACKAGE_NAME="linux-3.16.3"
+PACKAGE_VERSION="3.17"
+PACKAGE_NAME="linux-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Linux kernel"
 PROJECT_URL="https://www.kernel.org"
 PACKAGE_URL="https://www.kernel.org/pub/linux/kernel/v3.x/${PACKAGE_NAME}.tar.xz"
@@ -28,4 +29,38 @@ function build() {
   pushd "$INSTALL_DIR/boot" >/dev/null
   execute ln -s "$vmlinuz" vmlinuz
   popd >/dev/null
+}
+
+function check_latest() {
+  python3 <<EOF
+import sys
+from html.parser import HTMLParser
+from urllib.request import urlopen
+
+class KernelPageParser(HTMLParser):
+  def __init__(self):
+    super().__init__()
+    self.data = False
+
+  def handle_starttag(self, tag, attrs):
+    if tag == 'td':
+      for name, value in attrs:
+        if name == 'id' and value == 'latest_link':
+          self.data = True
+
+  def handle_data(self, data):
+    if self.data == True:
+      ver = data.strip(' \t\n')
+      if len(ver) > 0:
+        if ver == '${PACKAGE_VERSION}':
+          print('Package up to date')
+          sys.exit(0)
+        else:
+          print('Newer version %s detected' % ver, file=sys.stderr)
+          sys.exit(2)
+
+KernelPageParser().feed(urlopen('https://www.kernel.org').read().decode('utf-8'))
+print('Unknown error', file=sys.stderr)
+sys.exit(1)
+EOF
 }

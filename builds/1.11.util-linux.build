@@ -1,6 +1,7 @@
-PACKAGE_NAME="util-linux-2.25.1"
+PACKAGE_VERSION="2.25.1"
+PACKAGE_NAME="util-linux-${PACKAGE_VERSION}"
 PACKAGE_DESCRIPTION="Linux kernel utilities"
-PROJECT_URL="https://www.kernel.org"
+PROJECT_URL="ftp://www.kernel.org/pub/linux/utils/util-linux/"
 PACKAGE_URL="ftp://www.kernel.org/pub/linux/utils/util-linux/v2.25/${PACKAGE_NAME}.tar.xz"
 BUILD_FAST=yes
 LIBRARY=yes
@@ -24,4 +25,26 @@ function build() {
   assert_last
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
+}
+
+function check_latest() {
+  local ver=$(curl -s "$PROJECT_URL/" | tail -n 1 | awk '// { print $9; }')
+  ver=${ver:1}
+
+  if [[ "$ver" == $(echo $PACKAGE_VERSION | cut -d . -f 3 --complement) ]]; then
+    local nver="$PACKAGE_VERSION"
+    [[ -n $(echo "$nver" | cut -d . -f 3) ]] && nver=$(echo "$nver" | cut -d . -f 3 --complement)
+    ver=$(curl -s "$PROJECT_URL/v$nver/" | awk '// { print $9; }' | grep 'util-linux.*\.tar\.xz' | grep -v -e "-rc[0-9]\+" | sed -e 's/util-linux-//' -e 's/\.tar\.xz//' | cut -d . -f 3 -s | grep -v '^$' | sort -g | tail -n 1)
+
+    if [[ $ver != $(echo "$PACKAGE_VERSION" | cut -d . -f 3) ]]; then
+      echo "Newer version detected"
+      exit 2
+    else
+      echo "Package up to date"
+      exit 0
+    fi
+  else
+    echo "Newer version $ver detected"
+    exit 2
+  fi
 }

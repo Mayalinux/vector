@@ -12,6 +12,7 @@
 ####  - pack: Packages the compiled sources and places the archive in the right stage directory
 ####  - all: Executes in order: download, build, pack
 ####  - info: Prints package information
+####  - check-latest: Checks for updates
 ####
 
 EXEC_PATH="$(realpath $(dirname "$0"))"
@@ -148,9 +149,22 @@ function download() {
 }
 
 function build() {
-  require "$PACKAGE_PATH"
-
   echo "ERROR: No build action defined!" >&2
+  exit 1
+}
+
+##
+## Checks if the package version of the build file is the latest version.
+## The defatult implementation does nothing. This is intende to be substituted
+## and implemented on a per-package basis.
+##
+## Usage: check_latest
+##
+## Return: 0 if the build file is up to date, 1 if there is a newer version available
+##
+function check_latest() {
+  echo "Last version check not implemented for $PACKAGE_NAME" >&2
+
   exit 1
 }
 
@@ -187,7 +201,9 @@ N_CPUS="$((egrep '^processor' < /proc/cpuinfo ) | wc -l)"
 CACHE_EXTENSION=".tar.xz"
 
 # Include build file
+[[ -z "$1" ]] && echo "ERROR: No build file" >&2 && exit 1
 BUILD_FILE=$(find $BUILDS_DIR -name "*.${1}.build"); shift
+[[ ! -f "$BUILD_FILE" ]] && echo "ERROR: Build file does not exist" >&2 && exit 1
 source "$BUILD_FILE"
 
 # Compute package data
@@ -204,7 +220,9 @@ PACKAGE_PATH="${CACHE_DIR}/$PACKAGE_FILENAME"
 [[ ! -d "$BUILD_DIR" ]] && execute mkdir -p "$BUILD_DIR"
 
 # Check if package has already been built and exit if it has been
-package_built "$PACKAGE_NAME" && exit 0
+[[ "$1" =~ build|download ]] && package_built "$PACKAGE_NAME" && echo "$PACKAGE_NAME already built" >&2 && exit 0
+
+[[ -z "$1" ]] && echo "ERROR: No action" >&2 && exit 1
 
 # Execute action
 case "$1" in
@@ -222,8 +240,10 @@ case "$1" in
     execute rm -rf $BUILD_DIR/*
     execute rm -rf $INSTALL_DIR/*
     download; build; pack ;;
-  * | "")
-    echo "WARNING: no action defined" >&2
+  check-latest)
+    check_latest ;;
+  *)
+    echo "ERROR: invalid action" >&2
     exit 1
     ;;
 esac
