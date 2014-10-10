@@ -2,7 +2,7 @@ PACKAGE_VERSION="3.17"
 PACKAGE_NAME="linux-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Linux kernel"
 PROJECT_URL="https://www.kernel.org"
-PACKAGE_URL="https://www.kernel.org/pub/linux/kernel/v3.x/${PACKAGE_NAME}.tar.xz"
+PACKAGE_URL="https://www.kernel.org/pub/linux/kernel/v$(echo $PACKAGE_VERSION | cut -d . -f 1).x/${PACKAGE_NAME}.tar.xz"
 LIBRARY=no
 
 function build() {
@@ -47,6 +47,7 @@ class KernelPageParser(HTMLParser):
       for name, value in attrs:
         if name == 'id' and value == 'latest_link':
           self.data = True
+          break
 
   def handle_data(self, data):
     if self.data == True:
