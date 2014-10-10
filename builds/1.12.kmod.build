@@ -1,4 +1,5 @@
-PACKAGE_NAME="kmod-18"
+PACKAGE_VERSION="18"
+PACKAGE_NAME="kmod-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Linux kernel module utilities"
 PROJECT_URL="https://www.kernel.org"
 PACKAGE_URL="https://www.kernel.org/pub/linux/utils/kernel/kmod/${PACKAGE_NAME}.tar.xz"
@@ -36,4 +37,16 @@ function build() {
   popd >/dev/null
 
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -s --connect-timeout 10 "ftp://www.kernel.org/pub/linux/utils/kernel/kmod/" | awk '/kmod/ { sub("kmod", "", $9); print $9; } // {}' | grep '.*\.tar\.xz$' | grep -v doc | sed -e "s/\.tar\.xz$//" -e "s/^-//" | sort -V | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "Newer version $ver detected"
+    exit 2
+  fi
 }

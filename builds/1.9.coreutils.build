@@ -1,4 +1,5 @@
-PACKAGE_NAME="coreutils-8.23"
+PACKAGE_VERSION="8.23"
+PACKAGE_NAME="coreutils-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Core OS utilities"
 PROJECT_URL="http://www.gnu.org/software/coreutils/"
 PACKAGE_URL="http://ftp.gnu.org/gnu/coreutils/${PACKAGE_NAME}.tar.xz"
@@ -22,4 +23,16 @@ function build() {
   make DESTDIR="$INSTALL_DIR" install
   assert_last
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -s --connect-timeout 10 "ftp://ftp.gnu.org/gnu/coreutils/" | awk '/coreutils/ { sub("coreutils", "", $9); print $9; } // {}' | grep '.*\.tar\.xz$' | grep -v doc | sed -e "s/\.tar\.xz$//" -e "s/^-//" | sort -V | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "Newer version $ver detected"
+    exit 2
+  fi
 }

@@ -67,7 +67,9 @@ with Popen(['sort', '-V'], stdin=subprocess.PIPE, stdout=subprocess.PIPE) as pip
 
 if ver != '$PACKAGE_VERSION':
   print('New version %s detected' % ver)
+  sys.exit(2)
 else:
   print('Package up to date')
+  sys.exit(0)
 EOF
 }

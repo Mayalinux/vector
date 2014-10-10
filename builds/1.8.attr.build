@@ -1,4 +1,5 @@
-PACKAGE_NAME="attr-2.4.47"
+PACKAGE_VERSION="2.4.47"
+PACKAGE_NAME="attr-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION=""
 PROJECT_URL="http://savannah.nongnu.org/projects/attr"
 CACHE_EXTENSION=".tar.gz"
@@ -18,4 +19,16 @@ function build() {
   make DESTDIR="$INSTALL_DIR" install install-lib
   assert_last
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -L -s --connect-timeout 10 "http://download.savannah.gnu.org/releases/attr/" | egrep -o "attr-([a-z0-9.]|-)+\.src\.tar\.gz" | sed -e "s/attr-//" -e "s/\.src\.tar\.gz//" | sort -V -u | tail -n 1)
+  
+  if [[ "$ver" != "$PACKAGE_VERSION" ]]; then
+    echo "New version $ver detected"
+    exit 2
+  else
+    echo "Package up to date"
+    exit 0
+  fi
 }
