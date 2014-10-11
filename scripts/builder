@@ -171,7 +171,26 @@ function check_latest() {
 function pack() {
   execute "$EXEC_PATH/pack" "$STAGE" "$PACKAGE_NAME"
   execute "$EXEC_PATH/toenv" "$STAGE" "$PACKAGE_NAME"
-  [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}"
+  [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}" -n /{lib,lib64} /usr/{lib,lib64} /usr/local/{lib,lib64}
+}
+
+##
+## Strips unneeded information from package executables.
+##
+## Usage: strip_package
+##
+function strip_package() {
+  echo "Stripping package..."
+
+  # Program and shared objects
+  for f in $(find $INSTALL_DIR/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin,lib,lib64,usr/lib,usr/lib64,usr/local/lib,usr/local/lib64} -type f -executable 2>/dev/null); do
+    strip --strip-unneeded "$f"
+  done
+
+  # Static libraries
+  for f in $(find $INSTALLDIR/{lib,lib64,usr/lib,usr/lib64,usr/local/lib,usr/local/lib64} -type -f -executable -name '*.a' 2>/dev/null); do
+    strip -g "$f"
+  done
 }
 
 function info() {
@@ -190,8 +209,8 @@ function info() {
 # Checks stage directory
 for dir in $STAGES_DIR/stage{1,2,3,P}; do [[ ! -d "$dir" ]] && mkdir -p "$dir"; done
 
-# Detect kernel directory
-KERNEL_DIR="$(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1)"
+# Detect latest kernel directory
+KERNEL_DIR="$(realpath $(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1))"
 [[ -z "$KERNEL_DIR" ]] && [[ ! "$1" =~ linux* ]] && echo "No kernel directory found in $(realpath .)" && exit 1
 
 # Detect number of CPUS

@@ -12,6 +12,7 @@
 #### NOTE: Set BUILD_FAST to true for small packages to build them in /tmp (this assumes /tmp is on tmpfs or such)
 #### NOTE: You may add a check_latest() function that checks if the build file is up to date
 #### NOTE: You may add an info() function to customize the 'info' command output of the builder
+#### NOTE: You may add a pack() function to customize the 'pack' command of the builder
 ####
 
 PACKAGE_VERSION=""
@@ -40,10 +41,4 @@ function build() {
   execute make -j$(($N_CPUS+1))
   make DESTDIR="$INSTALL_DIR" install && assert_last
   popd >/dev/null
-}
-
-function pack() {
-  execute $(dirname "$0")/pack "$STAGE" "$PACKAGE_NAME"
-  execute $(dirname "$0")/toenv "$STAGE" "$PACKAGE_NAME"
-  [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}"
 }

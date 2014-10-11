@@ -1,0 +1,22 @@
+#!/bin/bash
+
+###
+### Show dynamic library dependencies of a ready to be packed package
+###
+####
+#### Usage: showdepends
+####
+
+source $(dirname "$0")/dirs.inc.sh
+
+exec 4>"$DEP_LOGFILE"
+
+function needed() {
+  for f in $(find $INSTALL_DIR/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin} -type f -executable 2>/dev/null); do
+    objdump -w -p "$f" 2>/dev/null | grep NEEDED | sed -e 's/[ \t]*//g' -e 's/NEEDED//'
+  done
+}
+
+needed | sort -u >&4
+
+exec 4>&-

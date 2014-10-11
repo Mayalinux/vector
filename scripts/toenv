@@ -37,4 +37,3 @@ echo "Extracting package ${PKG_FILE}..."
 pushd "$ENV_DIR" >&3
 tar xf "$PKG_PATH" >&3
 popd >&3
-

@@ -36,6 +36,9 @@ case "$STAGE" in
 	;;
 esac
 
+# Generate dependencies
+$(realpath -L -P $(dirname "$0"))/showdepends
+
 # Create output filename
 PKG_FILE="${PKG_NAME}.tar.xz"
 PKG_PATH="${STAGE_DIR}/${PKG_FILE}"
@@ -55,6 +58,13 @@ echo -n "- * Original size: "
 du -h "$INSTALL_DIR" | tail -n 1 | awk '{ print $1; }'
 echo -n "- * Packed size: "
 du -h "$PKG_PATH" | awk '{ print $1; }'
+
+# Display shared dependencies
+if [[ -f "$DEP_LOGFILE" ]]; then
+  echo
+  echo "- Shared object dependencies"
+  awk '{ print ">> " $0; }' <$DEP_LOGFILE
+fi
 
 echo
 # Clean-up
