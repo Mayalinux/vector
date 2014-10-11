@@ -37,6 +37,7 @@ function build() {
   popd >/dev/null
 
   popd >/dev/null
+  strip_package
 }
 
 function check_latest() {

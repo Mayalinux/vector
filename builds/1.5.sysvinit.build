@@ -18,6 +18,7 @@ function build() {
   make ROOT="$INSTALL_DIR" install
   assert_last
   popd >/dev/null
+  strip_package
 }
 
 function check_latest() {

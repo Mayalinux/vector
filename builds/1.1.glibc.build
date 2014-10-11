@@ -19,6 +19,7 @@ function build() {
   popd >/dev/null
   execute make -C "$BDIR" -j$(($N_CPUS+1))
   execute make -C "$BDIR" install_root="$INSTALL_DIR" install
+  strip_package
 }
 
 function check_latest() {

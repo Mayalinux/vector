@@ -184,12 +184,12 @@ function strip_package() {
 
   # Program and shared objects
   for f in $(find $INSTALL_DIR/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin,lib,lib64,usr/lib,usr/lib64,usr/local/lib,usr/local/lib64} -type f -executable 2>/dev/null); do
-    strip --strip-unneeded "$f"
+    strip --strip-unneeded "$f" 2>/dev/null
   done
 
   # Static libraries
   for f in $(find $INSTALLDIR/{lib,lib64,usr/lib,usr/lib64,usr/local/lib,usr/local/lib64} -type -f -executable -name '*.a' 2>/dev/null); do
-    strip -g "$f"
+    strip -g "$f" 2>/dev/null
   done
 }
 

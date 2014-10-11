@@ -21,6 +21,7 @@ function build() {
   make DESTDIR="$INSTALL_DIR" install
   assert_last
   popd >/dev/null
+  strip_package
 }
 
 function check_latest() {

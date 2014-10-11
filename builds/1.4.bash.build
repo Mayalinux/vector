@@ -59,6 +59,7 @@ function build() {
   pushd "$INSTALL_DIR/bin" >/dev/null
   execute ln -s bash sh
   popd >/dev/null
+  strip_package
 }
 
 function check_latest() {

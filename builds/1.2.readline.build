@@ -23,6 +23,7 @@ function build() {
   execute make DESTDIR="$INSTALL_DIR" install
 
   popd >/dev/null
+  strip_package
 }
 
 function check_latest() {
