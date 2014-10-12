@@ -11,7 +11,7 @@
 
 STAGE="$1"
 
-source $(realpath $(dirname "$0"))/dirs.inc.sh
+source $(dirname "$0")/dirs.inc.sh
 
 echo "Building stage ${STAGE}..."
 
