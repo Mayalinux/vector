@@ -35,3 +35,14 @@ mkdir -p "${ENV_DIR}" >/dev/null
 pushd ${ENV_DIR}
 tar -xvf "${OTHER_DIR}/misc-config.tar.xz"
 popd >/dev/null
+
+# Setup package database
+echo Creating new package database structure...
+sqlite3 $DB_PACKAGES <<EOF
+.bail on
+DROP TABLE IF EXISTS packages;
+DROP TABLE IF EXISTS shared_objects;
+
+CREATE TABLE packages(name VARCHAR(256) NOT NULL, version VARCHAR(32) NOT NULL, file VARCHAR(1024), build_date INTEGER DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(name, version)) WITHOUT ROWID;
+CREATE TABLE shared_objects(package_name VARCHAR(256) NOT NULL, package_version VARCHAR(32) NOT NULL, libfile VARCHAR(1024) NOT NULL, PRIMARY KEY(package_name, package_version, libfile), FOREIGN KEY(package_name, package_version) REFERENCES packages(name, version)) WITHOUT ROWID;
+EOF

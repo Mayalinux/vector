@@ -15,9 +15,9 @@
 ####  - check-latest: Checks for updates
 ####
 
-EXEC_PATH="$(realpath $(dirname "$0"))"
+EXEC_PATH="$(realpath -L -P $(dirname "$0"))"
 
-source scripts/dirs.inc.sh
+source $EXEC_PATH/dirs.inc.sh
 
 ##
 ## Download a file.
@@ -49,7 +49,6 @@ function download_file() {
 ##
 function depends_on() {
   local dep_name="$1"
-  local dep_file="${dep_name}.tar.xz"
 
   echo "Building dependency ${dep_name}..."
 
@@ -75,9 +74,8 @@ function depends_on() {
 ##
 function package_built() {
   local dep_name="$1"
-  local dep_file="${dep_name}.tar.xz"
 
-  test -f "$STAGES_DIR/stage$STAGE/$dep_file"
+  test -n "$(sqlite3 $DB_PACKAGES "SELECT * FROM packages WHERE name = '$1';")"
 }
 
 ##
@@ -169,9 +167,19 @@ function check_latest() {
 }
 
 function pack() {
+  register_build
   execute "$EXEC_PATH/pack" "$STAGE" "$PACKAGE_NAME"
   execute "$EXEC_PATH/toenv" "$STAGE" "$PACKAGE_NAME"
   [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}" -n /{lib,lib64} /usr/{lib,lib64} /usr/local/{lib,lib64}
+}
+
+##
+## Registers the package build
+##
+## Usage: register_build
+##
+function register_build() {
+  sqlite3 $DB_PACKAGES "INSERT INTO packages(name, version, file) VALUES('$PACKAGE', '$PACKAGE_VERSION', '$STAGES_DIR/stage$STAGE/${PACKAGE_NAME}.tar.xz');"
 }
 
 ##
@@ -210,7 +218,7 @@ function info() {
 for dir in $STAGES_DIR/stage{1,2,3,P}; do [[ ! -d "$dir" ]] && mkdir -p "$dir"; done
 
 # Detect latest kernel directory
-KERNEL_DIR="$(realpath $(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1))"
+KERNEL_DIR="$(realpath $(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1) 2>/dev/null)"
 [[ -z "$KERNEL_DIR" ]] && [[ ! "$1" =~ linux* ]] && echo "No kernel directory found in $(realpath .)" && exit 1
 
 # Detect number of CPUS
@@ -219,9 +227,12 @@ N_CPUS="$((egrep '^processor' < /proc/cpuinfo ) | wc -l)"
 # Cache file default extension
 CACHE_EXTENSION=".tar.xz"
 
+# Get package
+PACKAGE="$1"; shift
+
 # Include build file
 [[ -z "$1" ]] && echo "ERROR: No build file" >&2 && exit 1
-BUILD_FILE=$(find $BUILDS_DIR -name "*.${1}.build"); shift
+BUILD_FILE=$(find $BUILDS_DIR -name "*.${PACKAGE}.build")
 [[ ! -f "$BUILD_FILE" ]] && echo "ERROR: Build file does not exist" >&2 && exit 1
 source "$BUILD_FILE"
 
@@ -239,7 +250,7 @@ PACKAGE_PATH="${CACHE_DIR}/$PACKAGE_FILENAME"
 [[ ! -d "$BUILD_DIR" ]] && execute mkdir -p "$BUILD_DIR"
 
 # Check if package has already been built and exit if it has been
-[[ "$1" =~ build|download ]] && package_built "$PACKAGE_NAME" && echo "$PACKAGE_NAME already built" >&2 && exit 0
+[[ "$1" =~ build|download|all ]] && package_built "$PACKAGE" && echo "$PACKAGE already built" >&2 && exit 0
 
 [[ -z "$1" ]] && echo "ERROR: No action" >&2 && exit 1
 
