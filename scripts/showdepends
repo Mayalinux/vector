@@ -12,7 +12,7 @@ source $(dirname "$0")/dirs.inc.sh
 exec 4>"$DEP_LOGFILE"
 
 function needed() {
-  for f in $(find $INSTALL_DIR/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin} -type f -executable 2>/dev/null); do
+  for f in $(find $INSTALL_DIR/{bin,sbin,lib,lib64,usr/bin,usr/sbin,usr/lib,usr/lib64,usr/local/bin,usr/local/sbin,usr/local/lib,usr/local/lib64} -type f -executable 2>/dev/null); do
     objdump -w -p "$f" 2>/dev/null | grep NEEDED | sed -e 's/[ \t]*//g' -e 's/NEEDED//'
   done
 }
