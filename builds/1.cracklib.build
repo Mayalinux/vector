@@ -1,0 +1,74 @@
+PACKAGE_VERSION="2.9.2"
+PACKAGE_NAME="$PACKAGE-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Password checking library"
+PROJECT_URL="http://sourceforge.net/projects/cracklib/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://downloads.sourceforge.net/project/cracklib/cracklib/$PACKAGE_VERSION/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on libz
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --without-python && assert_last
+  execute make -j$(($N_CPUS+1))
+  make DESTDIR="$INSTALL_DIR" install && assert_last
+  popd >/dev/null
+}
+
+function check_latest() {
+  python3 <<EOF
+import sys
+from html.parser import HTMLParser
+from urllib.request import urlopen
+import subprocess
+from subprocess import Popen
+
+VERSIONS = []
+
+class VersionPageParser(HTMLParser):
+  def __init__(self):
+    super().__init__()
+    self.data = False
+
+  def handle_starttag(self, tag, attrs):
+    global VERSIONS
+
+    if tag == 'tr':
+      for name, value in attrs:
+        if name == 'class' and 'folder' in value:
+          for name, value in attrs:
+            if name == 'title':
+              VERSIONS.append(value)
+              break
+          break
+
+VersionPageParser().feed(urlopen('http://sourceforge.net/projects/cracklib/files/cracklib/').read().decode('utf-8'))
+
+with Popen(['sort', '-V'], stdin=subprocess.PIPE, stdout=subprocess.PIPE) as pipe:
+  for v in VERSIONS:
+    pipe.stdin.write('{}\n'.format(v).encode('utf-8'))
+
+  pipe.stdin.close()
+
+  with Popen(['tail', '-n', '-1'], stdin=subprocess.PIPE, stdout=subprocess.PIPE) as pipe2:
+    pipe2.stdin.write(pipe.stdout.read())
+    pipe2.stdin.close()
+    ver = pipe2.stdout.read().decode('utf-8').strip(' \n\t')
+
+if ver != '$PACKAGE_VERSION':
+  print('New version %s detected' % ver)
+  sys.exit(2)
+else:
+  print('Package up to date')
+  sys.exit(0)
+EOF
+}

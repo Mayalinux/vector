@@ -1,0 +1,36 @@
+PACKAGE_VERSION="6.1.19"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Berkley database library"
+PROJECT_URL="http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html"
+PACKAGE_URL="http://mayalinux.github.io/repo/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  ../$PACKAGE_NAME/dist/configure CFLAGS="-I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-debug --disable-diagnostic --disable-java --disable-jdbc --disable-tcl --enable-static --enable-shared && assert_last
+  execute make -j$(($N_CPUS+1))
+  make DESTDIR="$INSTALL_DIR" install && assert_last
+  rm -rf "$INSTALL_DIR/usr/doc"
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl -L -s "http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/downloads/index.html" | egrep -o "/db-.*\.tar\.gz\"" | sed 's/ /\n/g' | grep -v "NC" | cut -d - -f 2 | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date."
+    exit 0
+  else
+    echo "New version $ver detected."
+    exit 2
+  fi
+}
