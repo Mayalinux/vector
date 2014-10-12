@@ -26,6 +26,7 @@ function download() {
 
 function build() {
   depends_on readline
+  depends_on ncurses
 
   require "$PACKAGE_PATH"
 
