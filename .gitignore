@@ -6,3 +6,4 @@ cache/*
 env/*
 *.img
 /packages.sqlite
+/shared-objects.sqlite
