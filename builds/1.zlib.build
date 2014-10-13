@@ -1,0 +1,35 @@
+PACKAGE_VERSION="1.2.8"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Zlib compression library"
+PROJECT_URL="http://zlib.net"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://zlib.net/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
+
+  ./configure --prefix=/usr --eprefix=/usr --64 && assert_last
+  execute make -j$(($N_CPUS+1)) CFLAGS="-I$ENV_DIR/usr/include"
+  make DESTDIR="$INSTALL_DIR" install && assert_last
+  strip_package
+
+  popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -L -s "$PROJECT_URL" | grep -E -o "/zlib-.*\.tar\.gz\"" | cut -d - -f 2 | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
