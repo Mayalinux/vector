@@ -41,5 +41,5 @@ function build() {
   execute make -j$(($N_CPUS+1))
   make DESTDIR="$INSTALL_DIR" install && assert_last
   popd >/dev/null
-  strip-package
+  strip_package
 }
