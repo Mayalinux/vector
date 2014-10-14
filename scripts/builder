@@ -254,6 +254,10 @@ PACKAGE_PATH="${CACHE_DIR}/$PACKAGE_FILENAME"
 
 [[ -z "$1" ]] && echo "ERROR: No action" >&2 && exit 1
 
+# Include settings file (if any)
+SETTINGS_FILE="$BASE_DIR/settings.conf.sh"
+[[ "$1" =~ build|all ]] && [[ -f "$SETTINGS_FILE" ]] && source "$SETTINGS_FILE"
+
 # Execute action
 case "$1" in
   download)

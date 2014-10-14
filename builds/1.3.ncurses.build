@@ -23,13 +23,13 @@ function build() {
 
   pushd "$BDIR" >/dev/null
   # Build non-wide library
-  execute ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" $build_options
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" $build_options
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
 
   # Build wide library
   execute make clean
-  ../$PACKAGE_NAME/configure CFLAGS="-I$ENV_DIR/usr/include" $build_options --enable-widec
+  ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" $build_options --enable-widec
   assert_last
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install

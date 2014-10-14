@@ -7,3 +7,4 @@ env/*
 *.img
 /packages.sqlite
 /shared-objects.sqlite
+/settings.conf.sh
