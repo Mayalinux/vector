@@ -8,6 +8,7 @@ LIBRARY=no
 
 function build() {
   depends_on attr
+  depends_on gmp
 
   require "$PACKAGE_PATH"
 

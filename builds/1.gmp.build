@@ -1,0 +1,37 @@
+PACKAGE_VERSION="6.0.0a"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="The GNU Multiple Precision arithmetic library"
+PROJECT_URL="https://gmplib.org"
+PACKAGE_URL="$PROJECT_URL/download/gmp/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  local PNAME=$(echo $PACKAGE_NAME | sed 's/[a-zA-Z]*$//')
+
+  pushd "$BDIR" >/dev/null
+  ../$PNAME/configure CFLAGS="-I$ENV_DIR/usr/include" LDFLAGS="-L$ENV_DIR/lib -L$ENVDIR/lib64 -L$ENV_DIR/usr/lib -L$ENV_DIR/usr/lib64" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-readline && assert_last
+  execute make -j$(($N_CPUS+1))
+  make DESTDIR="$INSTALL_DIR" install && assert_last
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s -L $PROJECT_URL | grep -o -E 'gmp-([a-zA-Z0-9.]|-)*\.tar\.xz' | rev | cut -d . -f 1,2 --complement | rev | cut -d - -f 1 --complement | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
