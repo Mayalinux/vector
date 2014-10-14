@@ -18,9 +18,9 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --without-python && assert_last
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --without-python
   execute make -j$(($N_CPUS+1))
-  make DESTDIR="$INSTALL_DIR" install && assert_last
+  execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null
 }
 

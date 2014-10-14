@@ -132,9 +132,9 @@ function assert_last() {
 ## Usage: execute command [arg [...]]
 ##
 function execute() {
-  [[ -n "$DEBUG" ]] && echo "$*"
+  [[ -n "$BUILDER_DEBUG" ]] && echo "$*"
 
-  $*
+  "$@"
 
   if [[ $? -ne 0 ]]; then
     echo "$1 returned $?"
@@ -217,10 +217,6 @@ function info() {
 # Checks stage directory
 for dir in $STAGES_DIR/stage{1,2,3,P}; do [[ ! -d "$dir" ]] && mkdir -p "$dir"; done
 
-# Detect latest kernel directory
-KERNEL_DIR="$(realpath $(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1) 2>/dev/null)"
-[[ -z "$KERNEL_DIR" ]] && [[ ! "$1" =~ linux* ]] && echo "No kernel directory found in $(realpath .)" && exit 1
-
 # Detect number of CPUS
 N_CPUS="$((egrep '^processor' < /proc/cpuinfo ) | wc -l)"
 
@@ -258,22 +254,51 @@ PACKAGE_PATH="${CACHE_DIR}/$PACKAGE_FILENAME"
 SETTINGS_FILE="$BASE_DIR/settings.conf.sh"
 [[ "$1" =~ build|all ]] && [[ -f "$SETTINGS_FILE" ]] && source "$SETTINGS_FILE"
 
+##
+## Proxy build function
+##
+## Usage: build_proxy
+##
+function build_proxy() {
+  if [[ "$PACKAGE" != "linux" ]]; then
+    depends_on linux
+
+  # Detect latest kernel directory
+  KERNEL_DIR="$(realpath $(find -maxdepth 1 -name 'linux*' -type d | sort -f | tail -n 1) 2>/dev/null)"
+  [[ -z "$KERNEL_DIR" ]] && [[ ! "$1" =~ linux* ]] && echo "No kernel directory found in $(realpath .)" && exit 1
+
+    if [[ "$PACKAGE" != "glibc" ]]; then
+      depends_on glibc
+    fi
+  fi
+
+  execute rm -rf $BUILD_DIR/*
+  execute rm -rf $INSTALL_DIR/*
+  build
+}
+
+##
+## Proxy pack function
+##
+## Usage: pack_proxy
+##
+function pack_proxy() {
+  pack
+  execute rm -rf $BUILD_DIR/*
+}
+
 # Execute action
 case "$1" in
   download)
     download ;;
   build)
-    execute rm -rf $BUILD_DIR/*
-    execute rm -rf $INSTALL_DIR/*
-    build ;;
+    build_proxy ;;
   pack)
-    pack ;;
+    pack_proxy ;;
   info)
     info ;;
   all)
-    execute rm -rf $BUILD_DIR/*
-    execute rm -rf $INSTALL_DIR/*
-    download; build; pack ;;
+    download; build_proxy; pack_proxy ;;
   check-latest)
     check_latest ;;
   *)

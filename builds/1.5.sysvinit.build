@@ -14,9 +14,8 @@ function build() {
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
 
   pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
-  execute make
-  make ROOT="$INSTALL_DIR" install
-  assert_last
+  execute make CFLAGS="$CFLAGS"
+  execute make ROOT="$INSTALL_DIR" install
   popd >/dev/null
   strip_package
 }

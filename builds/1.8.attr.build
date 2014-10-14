@@ -13,11 +13,9 @@ function build() {
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
 
   pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
-  ./configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --libdir=/lib --bindir=/bin --sbindir=/sbin
-  assert_last
+  execute ./configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --libdir=/lib --bindir=/bin --sbindir=/sbin
   execute make -j$(($N_CPUS+1))
-  make DESTDIR="$INSTALL_DIR" install install-lib
-  assert_last
+  execute make DESTDIR="$INSTALL_DIR" install install-lib
   popd >/dev/null
   strip_package
 }
