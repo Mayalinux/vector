@@ -30,6 +30,14 @@ The *scripts* directory contains all the automation scripts used to build the
 system. Each script contains a header which explains how to run it and what it
 does.
 
+## Configuring common options
+To configure common build options, such as CFLAGS and LDFLAGS, create in the
+root directory a file named *settings.conf.sh* and put there the settings you
+need. The settings file is a bash file so you can also run commands within it
+and is sourced after the buildfile, only if building.
+Refer to the *settings.conf.sh-example* file to see a very basic example of
+settings file (which is the one I use).
+
 ## Building a single package
 The *scripts/builder* tool builds a single package and its dependencies.
 Each package contains a **build file** in the *builds/* directory which is used
