@@ -17,7 +17,7 @@ function build() {
   local PNAME=$(echo $PACKAGE_NAME | sed 's/[a-zA-Z]*$//')
 
   pushd "$BDIR" >/dev/null
-  ../$PNAME/configure CFLAGS="-I$ENV_DIR/usr/include" LDFLAGS="-L$ENV_DIR/lib -L$ENVDIR/lib64 -L$ENV_DIR/usr/lib -L$ENV_DIR/usr/lib64" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-readline && assert_last
+  ../$PNAME/configure CFLAGS="-I$ENV_DIR/usr/include" LDFLAGS="-L$ENV_DIR/lib -L$ENV_DIR/lib64 -L$ENV_DIR/usr/lib -L$ENV_DIR/usr/lib64" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-readline && assert_last
   execute make -j$(($N_CPUS+1))
   make DESTDIR="$INSTALL_DIR" install && assert_last
   popd >/dev/null

@@ -8,7 +8,7 @@ BUILD_FAST=yes
 LIBRARY=yes
 
 function build() {
-  depends_on libz
+  depends_on zlib
 
   require "$PACKAGE_PATH"
 
