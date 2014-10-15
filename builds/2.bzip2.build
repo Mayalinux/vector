@@ -1,0 +1,34 @@
+PACKAGE_VERSION="1.0.6"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Bzip2 library and tools"
+PROJECT_URL="http://bzip.org"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://bzip.org/$PACKAGE_VERSION/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  execute make CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64 -Wall" LDFLAGS="$LDFLAGS"
+  execute make PREFIX="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s -L $PROJECT_URL/downloads.html | grep -o -E "$PACKAGE-[a-zA-Z0-9.]+\.tar\.gz" | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
