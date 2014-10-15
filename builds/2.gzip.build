@@ -1,0 +1,34 @@
+PACKAGE_VERSION="1.6"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Gzip compression tool"
+PROJECT_URL="https://www.gnu.org/software/gzip/"
+PACKAGE_URL="http://ftp.gnu.org/gnu/gzip/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s ftp://ftp.gnu.org/gnu/gzip/ | awk '{ print $9 }' | grep '\.tar\.xz$' | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

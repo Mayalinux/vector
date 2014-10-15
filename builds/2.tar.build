@@ -1,0 +1,37 @@
+PACKAGE_VERSION="1.28"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION=""
+PROJECT_URL="https://www.gnu.org/software/tar/"
+PACKAGE_URL="http://ftp.gnu.org/gnu/tar/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on acl
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --without-selinux
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s ftp://ftp.gnu.org/gnu/tar/ | grep -F 'tar-latest.tar.xz' | grep -v '\.sig$' | awk '{ print $11 }' | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

@@ -9,6 +9,8 @@ LIBRARY=no
 function build() {
   depends_on attr
   depends_on gmp
+  depends_on acl
+  depends_on libcap-ng
 
   require "$PACKAGE_PATH"
 
@@ -18,7 +20,7 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --bindir=/bin --sbindir=/sbin --libdir=/lib --sysconfdir=/etc --localstatedir=/var --without-openssl --disable-acl --disable-libsmack --disable-libcap --disable-rpath
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --bindir=/bin --sbindir=/sbin --libdir=/lib --sysconfdir=/etc --localstatedir=/var --without-openssl --disable-libsmack --disable-rpath
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

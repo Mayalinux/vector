@@ -1,0 +1,33 @@
+PACKAGE_VERSION="2.2.52"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Access Control Lists library and tools"
+PROJECT_URL="http://savannah.nongnu.org/projects/acl"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://download.savannah.gnu.org/releases/acl/${PACKAGE_NAME}.src${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
+  execute ./configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var 
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s -L http://download.savannah.gnu.org/releases/acl/ | grep -o -E "${PACKAGE}-[0-9A-Za-z.]+\.src\.tar\.gz" | cut -d - -f 1 --complement | rev | cut -d . -f 1,2,3 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo "Package up to date"
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
