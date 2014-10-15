@@ -1,4 +1,5 @@
-PACKAGE_NAME="vim-7.4"
+PACKAGE_VERSION="7.4"
+PACKAGE_NAME="$PACKAGE-$PACKAGE_VERSION"
 PACKAGE_DESCRIPTION="Vi Improved text editor"
 PROJECT_URL="http://www.vim.org"
 CACHE_EXTENSION=".tar.bz2"
@@ -7,16 +8,30 @@ BUILD_FAST=no
 LIBRARY=no
 
 function build() {
+  depends_on acl
+  depends_on ncurses
+
   require "$PACKAGE_PATH"
 
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
 
-  local VDIR="$BUILD_DIR/vim74"
+  local VDIR="$BUILD_DIR/vim$(echo $PACKAGE_VERSION | sed 's/\.//g')"
 
   pushd "$VDIR" >/dev/null
-  ./configure CFLAGS="-O2 -I$ENV_DIR/usr/include" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-darwin --disable-selinux --disable-xsmp --disable-xsmp-interact --disable-netbeans --enable-multibyte --enable-gui=no --disable-gpm --disable-sysmouse --without-x --disable-acl
-  assert_last
+  execute ./configure CFLAGS="$CFLAGS -O2" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-darwin --disable-selinux --disable-xsmp --disable-xsmp-interact --disable-netbeans --enable-multibyte --enable-gui=no --disable-gpm --disable-sysmouse --without-x
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s ftp://ftp.vim.org/pub/vim/unix/ | awk '{ print $9 }' | grep -F "$CACHE_EXTENSION" | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 1
+  fi
 }

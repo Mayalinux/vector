@@ -1,0 +1,40 @@
+PACKAGE_VERSION="2.02.111"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Linux Volume Manager 2"
+PROJECT_URL="https://sourceware.org/lvm2/"
+CACHE_EXTENSION=".tgz"
+PACKAGE_URL="ftp://sources.redhat.com/pub/lvm2/$(echo ${PACKAGE} | tr a-z A-Z).${PACKAGE_VERSION}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on readline
+  depends_on ncurses
+  depends_on util-linux
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$(echo "$PACKAGE" | tr a-z A-Z).$PACKAGE_VERSION/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-udev-systemd-background-jobs --enable-applib --enable-cmdlib --disable-selinux
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s ftp://sources.redhat.com/pub/lvm2/ | awk '{ print $9 }' | grep '\.tgz$' | cut -d . -f 1 --complement | rev | cut -d . -f 1 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

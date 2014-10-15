@@ -1,0 +1,44 @@
+PACKAGE_VERSION="1.6.6"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Cryptsetup utility to setup DM-Crypt based disk encryption"
+PROJECT_URL="https://code.google.com/p/cryptsetup/"
+PACKAGE_URL="https://www.kernel.org/pub/linux/utils/cryptsetup/v1.6/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on lvm2
+  depends_on popt
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --disable-veritysetup --disable-selinux --disable-udev --with-crypto-backend=kernel
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -l -s "ftp://kernel.org/pub/linux/utils/cryptsetup/" | sort -V | tail -n 1)
+
+  if [[ "$ver" == "v$(echo $PACKAGE_VERSION | cut -d . -f 1,2)" ]]; then
+    ver=$(curl --connect-timeout 10 -l -s "ftp://www.kernel.org/pub/linux/utils/cryptsetup/v$(echo $PACKAGE_VERSION | cut -d . -f 1,2)/" | grep '\.tar\.xz$' | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sed 's/-rc\[0-9\]//'| sort -V -u | tail -n 1)
+    if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+      echo Package up to date
+      exit 0
+    else
+      echo "New version $ver detected"
+      exit 2
+    fi
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
