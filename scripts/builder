@@ -33,7 +33,7 @@ function download_file() {
 
   if [[ ! -f "$fname" ]]; then
     echo "Downloading ${url}..."
-    curl -L -# -o "$fname" "$url"
+    curl --connect-timeout 10 -L -# -o "$fname" "$url"
 
     if [[ $? -ne 0 ]]; then
       echo "ERROR: Unable to download file $url" >&2

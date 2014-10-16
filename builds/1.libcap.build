@@ -1,0 +1,39 @@
+PACKAGE_VERSION="2.24"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION=""
+PROJECT_URL="https://sites.google.com/site/fullycapable/"
+PACKAGE_URL="https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  execute make -j$(($N_CPUS+1)) lib=lib inc_prefix=/usr SYSTEM_HEADERS="$ENV_DIR/usr/include" CFLAGS="$CFLAGS -O2 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" LDFLAGS="$LDFLAGS"
+  execute make DESTDIR="$INSTALL_DIR" lib=lib inc_prefix=/usr RAISE_SETFCAP=no install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl -s --connect-timeout 10 -l "ftp://kernel.org/pub/linux/libs/security/linux-privs/" | grep libcap | sort -V | tail -n 1)
+
+  if [[ "$ver" == "libcap$(echo "$PACKAGE_VERSION" | cut -d . -f 1)" ]]; then
+    ver=$(curl -s --connect-timeout 10 -l "ftp://kernel.org/pub/linux/libs/security/linux-privs/libcap$(echo "$PACKAGE_VERSION" | cut -d . -f 1)/" | grep -E '\.tar\.xz$' | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+    if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+      echo Package up to date
+      exit 0
+    else
+      echo "New version $ver detected"
+      exit 2
+    fi
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

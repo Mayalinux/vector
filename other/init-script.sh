@@ -9,7 +9,7 @@ mount -t proc proc /proc
 mount -t tmpfs run /run
 mount -t tmpfs devshm /dev/shm
 mount -t devpts devpts /dev/pts
-mount -t syfs sys /sys
+mount -t sysfs sys /sys
 mount -t tmpfs cgroup_root /sys/fs/cgroup
 
 exec /bin/bash
