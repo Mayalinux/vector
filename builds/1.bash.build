@@ -58,6 +58,8 @@ function build() {
 
   pushd "$INSTALL_DIR/bin" >/dev/null
   execute ln -s bash sh
+  execute mkdir -p ../usr/bin
+  execute ln -s /bin/bash ../usr/bin/bash
   popd >/dev/null
   strip_package
 }
