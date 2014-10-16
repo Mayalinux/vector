@@ -9,7 +9,8 @@ LIBRARY=yes
 function build() {
   depends_on ncurses
   depends_on zlib
-  depends_on libcap-ng
+  depends_on libcap
+  depends_on acl
 
   require "$PACKAGE_PATH"
 

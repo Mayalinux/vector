@@ -64,7 +64,7 @@ if [[ "$USER" = root ]]; then
 	chmod -Rf +x ${DST_DIR}/{bin,sbin,usr/bin,usr/sbin,usr/local/bin,usr/local/sbin,etc/init.d}
 
 	echo "Running ldconfig..."
-	ldconfig -r ${DST_DIR}
+	ldconfig -r ${DST_DIR} /lib{,64} /usr/lib{,64} /usr/local/lib{,64}
 
 	echo "WARNING: syslinux must be installed manually to boot the system"
 else

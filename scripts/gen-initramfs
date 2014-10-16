@@ -9,7 +9,7 @@
 
 # Source files are hard-linked, not copied, thus MUST NOT be modified in initramfs directory
 sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root sbin/pivot_root) 
-shared_libraries=(libc libuuid libmount libattr libncurses libncursesw libblkid ld libdl libcap)
+shared_libraries=(libc libuuid libmount libattr libncurses libncursesw libblkid ld libdl libcap libacl)
 
 source $(dirname "$0")/dirs.inc.sh
 

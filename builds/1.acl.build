@@ -13,9 +13,11 @@ function build() {
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
 
   pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
+  export OPTIMIZER=-O
+  export DEBUG=-DNDEBUG
   execute ./configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var 
   execute make -j$(($N_CPUS+1))
-  execute make DESTDIR="$INSTALL_DIR" install
+  execute make DESTDIR="$INSTALL_DIR" install install-lib
   popd >/dev/null
   strip_package
 }
