@@ -1,0 +1,39 @@
+PACKAGE_VERSION="5.20.1"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Perl language interpreter and libraries"
+PROJECT_URL="http://www.perl.org/"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="ftp://ftp.perl.org/pub/CPAN/src/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on db
+  depends_on gdbm
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  sed -i "s|\$run ./try|LD_LIBRARY_PATH='$ENV_DIR/lib:$ENV_DIR/lib64:$ENV_DIR/usr/lib:$ENV_DIR/usr/lib64' \$run ./try|g" ./Configure
+  execute ./Configure -Dprefix="/usr" -Dinstallusrbinperl -Dusethreads -Dusemorebits -Accflags="$CFLAGS" -Aldflags="$LDFLAGS" -Ode -Dcc=gcc
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -l -s "ftp://ftp.cpan.org/pub/CPAN/src/" | grep -F "$PACKAGE-" | grep '\.tar\.bz2$' | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -V -u | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
