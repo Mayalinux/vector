@@ -1,0 +1,43 @@
+PACKAGE_VERSION="4.9.1"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="The GNU Compiler Collection"
+PROJECT_URL="http://www.gnu.org/software/gcc/"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="ftp://ftp.gnu.org/gnu/$PACKAGE/$PACKAGE_NAME/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=no
+LIBRARY=yes
+
+function build() {
+  # This package requires binutils' ld to support sysroots.
+  # To check the feature run `ld --sysroot=foobar` and inspect output message.
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-threads --enable-tls --disable-bootstrap --enable-languages=c,c++,fortran --disable-multilib --with-build-sysroot="$ENV_DIR"
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+  
+  pushd "$INSTALL_DIR" >/dev/null
+  execute mkdir -p lib/
+  cd lib/ && execute ln -s ../usr/bin/cpp
+  popd >/dev/null
+}
+
+function check_latest() {
+  local ver=$(curl -l -s --connect-timeout 10 ftp://ftp.gnu.org/gnu/$PACKAGE/ | grep -E "$PACKAGE-[0-9.]+" | cut -d - -f 1 --complement | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
