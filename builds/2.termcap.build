@@ -1,0 +1,36 @@
+PACKAGE_VERSION="1.3.1"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Termcap library"
+PROJECT_URL="http://www.gnu.org/software/termutils/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="ftp://ftp.gnu.org/gnu/$PACKAGE/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure
+  execute make -j$(($N_CPUS+1)) CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS"
+  execute make prefix="$INSTALL_DIR" oldincludedir="" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s -l ftp://ftp.gnu.org/gnu/$PACKAGE/ | grep "$(echo $CACHE_EXTENSION | sed 's/\./\\./g')\$" | grep -v latest | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
