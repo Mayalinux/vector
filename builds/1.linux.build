@@ -29,6 +29,9 @@ function build() {
   pushd "$INSTALL_DIR/boot" >/dev/null
   execute ln -s "$vmlinuz" vmlinuz
   popd >/dev/null
+
+  execute mkdir -p $INSTALL_DIR/usr/include
+  execute cp -R $KDIR/usr/include/* $INSTALL_DIR/usr/include/
 }
 
 function check_latest() {
