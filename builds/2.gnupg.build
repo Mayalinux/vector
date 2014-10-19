@@ -1,0 +1,43 @@
+PACKAGE_VERSION="2.0.26"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="GNU Privacy Guard"
+PROJECT_URL="http://www.gnu.org/software/gnupg/"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="ftp://ftp.gnupg.org/gcrypt/$PACKAGE/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on zlib
+  depends_on libgcrypt
+  depends_on libgpg-error
+  depends_on libassuan
+  depends_on libksba
+  depends_on pth
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-selinux-support
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -sl ftp://ftp.gnupg.org/gcrypt/$PACKAGE/ | grep -F "$PACKAGE-" | grep "$(echo $CACHE_EXTENSION | sed 's/\./\\./g')\$" | grep -Ev 'alpha|beta|latest' | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
