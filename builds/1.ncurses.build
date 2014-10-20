@@ -8,16 +8,12 @@ PACKAGE_URL="ftp://ftp.gnu.org/pub/gnu/ncurses/${PACKAGE_NAME}${CACHE_EXTENSION}
 BUILD_FAST=yes
 LIBRARY=yes
 
-function download() {
-  download_file "$PACKAGE_URL" "$PACKAGE_PATH"
-}
-
 function build() {
   require "$PACKAGE_PATH"
 
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
 
-  local build_options="--without-ada --with-pkg-config --enable-pc-files --with-shared --enable-termcap --enable-symlinks --disable-rpath --disable-rpath-hack"
+  local build_options="--without-ada --with-pkg-config --enable-pc-files --with-shared --enable-termcap --enable-symlinks --disable-rpath --disable-rpath-hack --without-gpm"
   local BDIR="$BUILD_DIR/build"
   execute mkdir -p "$BDIR"
 

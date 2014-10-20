@@ -8,8 +8,12 @@ BUILD_FAST=no
 LIBRARY=yes
 
 function build() {
-  # This package requires binutils' ld to support sysroots.
+  # This package requires binutils built with '--with-sysroot' configure option.
   # To check the feature run `ld --sysroot=foobar` and inspect output message.
+  # If your linker does not support sysroots, download and compile binutils,
+  # installing it in whatever directory you like. Then add to your
+  # `settings.conf.sh' the path to the `ld' binary (e.g.:
+  # `/opt/binutils-cross/usr/bin/ld') in the `LD_CROSS' variable.
   require "$PACKAGE_PATH"
 
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
@@ -18,7 +22,14 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-threads --enable-tls --disable-bootstrap --enable-languages=c,c++,fortran --disable-multilib --with-build-sysroot="$ENV_DIR"
+  
+  if [[ -n "$LD_CROSS" ]]; then
+    local cross_dir="$(dirname "$LD_CROSS")"
+  else
+    local cross_dir="$(dirname $(find /bin /usr/bin -name 'ld' -executable | tail -n 1))"
+  fi
+
+  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-threads --enable-tls --disable-bootstrap --enable-languages=c,c++,fortran --disable-multilib --with-build-sysroot="$ENV_DIR"
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

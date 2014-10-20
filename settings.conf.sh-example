@@ -1,2 +1,3 @@
 CFLAGS="-I$ENV_DIR/usr/include"
 LDFLAGS="-L$ENV_DIR/lib -L$ENV_DIR/lib64 -L$ENV_DIR/usr/lib -L$ENV_DIR/usr/lib64"
+LD_CROSS=/opt/binutils-cross/usr/bin/ld
