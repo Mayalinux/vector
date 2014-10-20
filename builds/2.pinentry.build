@@ -19,7 +19,7 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-pinentry-tty --disable-pinentry-{gtk,gtk2,qt,qt4,qt4-clipboard} --enable-ncurses
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-pinentry-tty --disable-pinentry-{gtk,gtk2,qt,qt4,qt4-clipboard} --enable-ncurses
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

@@ -24,7 +24,7 @@ function build() {
   fi
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --disable-account-tools-setuid --without-selinux --without-acl --without-attr --without-tcb --with-libcrack --without-audit --with-libpam --without-nscd --with-sysroot="$ENV_DIR"
+  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --disable-account-tools-setuid --without-selinux --without-acl --without-attr --without-tcb --with-libcrack --without-audit --with-libpam --without-nscd --with-sysroot="$ENV_DIR"
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

@@ -15,7 +15,7 @@ function build() {
   local BDIR="$BUILD_DIR/$PACKAGE_NAME"
 
   pushd "$BDIR" >/dev/null
-  execute make CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64 -Wall" LDFLAGS="$LDFLAGS"
+  execute make CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64 -Wall" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS"
   execute make PREFIX="$INSTALL_DIR" install
   popd >/dev/null
   strip_package

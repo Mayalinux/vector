@@ -21,7 +21,7 @@ function build() {
 
   pushd "$BDIR" >/dev/null
   sed -i -e "s:\([^A-Za-z0-9]\)/lib:\1$ENV/lib:g" ../$PACKAGE_NAME/configure
-  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" --prefix=/usr --sysconfdir=/etc --disable-rpath --bindir=/bin --sbindir=/sbin --libdir=/lib --localstatedir=/var --with-ncurses --without-slang --without-user --without-smack --without-python --without-udev --with-sysroot="$ENV" --disable-makeinstall-{chown,setuid} --without-systemd
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --disable-rpath --bindir=/bin --sbindir=/sbin --libdir=/lib --localstatedir=/var --with-ncurses --without-slang --without-user --without-smack --without-python --without-udev --with-sysroot="$ENV" --disable-makeinstall-{chown,setuid} --without-systemd
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   strip_package

@@ -1,3 +1,13 @@
-CFLAGS="-I$ENV_DIR/usr/include"
-LDFLAGS="-L$ENV_DIR/lib -L$ENV_DIR/lib64 -L$ENV_DIR/usr/lib -L$ENV_DIR/usr/lib64"
+# CFLAGS is a set of common flags to be passed to the C compiler
+# CFLAGS_INCLUDE_DIRS is the set of common include directories to be passed to the C compiler (a set of `-I/path')
+CFLAGS=""
+CFLAGS_INCLUDE_DIRS="-I$ENV_DIR/usr/include"
+
+# LDFLAGS is a set of common flags to be passed to the LD linker
+# LDFLAGS_LIB_DIRS is the set of common shared object directories to be passed to the LD linker (a set of `-L/path')
+LDFLAGS=""
+LDFLAGS_LIB_DIRS="-L$ENV_DIR/lib -L$ENV_DIR/lib64 -L$ENV_DIR/usr/lib -L$ENV_DIR/usr/lib64"
+
+# LD_CROSS is the path to an LD linker supporting sysroots.
+#  If your default linker supports sysroots, you can safely delete this entry
 LD_CROSS=/opt/binutils-cross/usr/bin/ld

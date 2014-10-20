@@ -13,7 +13,7 @@ function build() {
   extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
 
   pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
-  execute ./configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --libdir=/lib --bindir=/bin --sbindir=/sbin
+  execute ./configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --libdir=/lib --bindir=/bin --sbindir=/sbin
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install install-lib
   popd >/dev/null

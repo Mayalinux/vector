@@ -17,7 +17,7 @@ function build() {
   local PNAME=$(echo $PACKAGE_NAME | sed 's/[a-zA-Z]*$//')
 
   pushd "$BDIR" >/dev/null
-  execute ../$PNAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-readline
+  execute ../$PNAME/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-readline
   execute make -j$(($N_CPUS+1))
   make DESTDIR="$INSTALL_DIR" install && assert_last
   popd >/dev/null

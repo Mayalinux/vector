@@ -18,7 +18,7 @@ function build() {
   local VDIR="$BUILD_DIR/vim$(echo $PACKAGE_VERSION | sed 's/\.//g')"
 
   pushd "$VDIR" >/dev/null
-  execute ./configure CFLAGS="$CFLAGS -O2" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-darwin --disable-selinux --disable-xsmp --disable-xsmp-interact --disable-netbeans --enable-multibyte --enable-gui=no --disable-gpm --disable-sysmouse --without-x
+  execute ./configure CFLAGS="$CFLAGS -O2" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-darwin --disable-selinux --disable-xsmp --disable-xsmp-interact --disable-netbeans --enable-multibyte --enable-gui=no --disable-gpm --disable-sysmouse --without-x
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

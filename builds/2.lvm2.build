@@ -20,7 +20,7 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$(echo "$PACKAGE" | tr a-z A-Z).$PACKAGE_VERSION/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-udev-systemd-background-jobs --enable-applib --enable-cmdlib --disable-selinux
+  execute ../$(echo "$PACKAGE" | tr a-z A-Z).$PACKAGE_VERSION/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-udev-systemd-background-jobs --enable-applib --enable-cmdlib --disable-selinux
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

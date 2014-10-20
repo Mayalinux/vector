@@ -29,7 +29,7 @@ function build() {
     local cross_dir="$(dirname $(find /bin /usr/bin -name 'ld' -executable | tail -n 1))"
   fi
 
-  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-threads --enable-tls --disable-bootstrap --enable-languages=c,c++,fortran --disable-multilib --with-build-sysroot="$ENV_DIR"
+  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --enable-threads --enable-tls --disable-bootstrap --enable-languages=c,c++,fortran --disable-multilib --with-build-sysroot="$ENV_DIR"
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null

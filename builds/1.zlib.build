@@ -15,7 +15,7 @@ function build() {
   pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
 
   execute ./configure --prefix=/usr --eprefix=/usr --64
-  execute make -j$(($N_CPUS+1)) CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS"
+  execute make -j$(($N_CPUS+1)) CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS"
   execute make DESTDIR="$INSTALL_DIR" install
   strip_package
 

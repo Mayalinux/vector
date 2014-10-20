@@ -14,7 +14,7 @@ function build() {
   local BDIR="$BUILD_DIR/$PACKAGE_NAME"
 
   pushd "$BDIR" >/dev/null
-  execute make -j$(($N_CPUS+1)) lib=lib inc_prefix=/usr SYSTEM_HEADERS="$ENV_DIR/usr/include" CFLAGS="$CFLAGS -O2 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" LDFLAGS="$LDFLAGS"
+  execute make -j$(($N_CPUS+1)) lib=lib inc_prefix=/usr SYSTEM_HEADERS="$ENV_DIR/usr/include" CFLAGS="$CFLAGS -O2 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS"
   execute make DESTDIR="$INSTALL_DIR" lib=lib inc_prefix=/usr RAISE_SETFCAP=no install
   popd >/dev/null
   strip_package
