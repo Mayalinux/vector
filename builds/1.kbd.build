@@ -1,0 +1,64 @@
+PACKAGE_VERSION="2.0.2"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Keyboard utilities"
+PROJECT_URL="http://kbd-project.org/"
+PACKAGE_URL="https://www.kernel.org/pub/linux/utils/$PACKAGE/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on autoconf
+  depends_on Linux-PAM
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
+  patch -p0 <<EOF
+--- configure.ac 2014-10-21 13:49:45.579032620 +0200
++++ configure.ac	2014-10-21 13:49:49.649030741 +0200
+@@ -11,8 +11,6 @@
+ AC_CONFIG_SRCDIR([src/loadkeys.c])
+ AC_CONFIG_HEADERS(config.h)
+ 
+-PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
+-
+ m4_ifndef([AM_SILENT_RULES], [m4_define([AM_SILENT_RULES],[])])
+ AM_SILENT_RULES([yes])
+
+EOF
+  autoreconf
+  popd >>/dev/null
+
+  if [[ -n "$LD_CROSS" ]]; then
+    local cross_dir="$(dirname "$LD_CROSS")"
+  else
+    local cross_dir="$(dirname $(find /bin /usr/bin -name 'ld' -executable | tail -n 1))"
+  fi
+
+  pushd "$BDIR" >/dev/null
+  # Remove CHECK library check
+  local CONFIG_FILE="$BUILD_DIR/$PACKAGE_NAME/configure"
+  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --disable-static --enable-optional-progs --enable-libkeymap --with-sysroot="$ENV_DIR"
+  echo -e "all:\n\techo Fake tests!\ninstall:\n\techo OK" > tests/Makefile
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s -l ftp://ftp.kernel.org/pub/linux/utils/$PACKAGE/ | grep "$(echo $CACHE_EXTENSION | sed 's/\./\\./g')\$" | grep -Ev "latest|-rc[0-9]+" | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

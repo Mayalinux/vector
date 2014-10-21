@@ -1,0 +1,37 @@
+PACKAGE_VERSION="3.2.1"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="PCI utilities"
+PROJECT_URL="http://mj.ucw.cz/sw/$PACKAGE/"
+PACKAGE_URL="ftp://ftp.kernel.org/pub/software/utils/$PACKAGE/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on zlib
+  depends_on kmod
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  sed -i 's|^[ \t]*CFLAGS[ \t]*=|CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS|"' Makefile
+  execute make ZLIB=yes DNS=yes SHARED=yes LIBKMOD=yes LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS"
+  execute make PREFIX="/usr" DESTDIR="$INSTALL_DIR" install install-lib
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -s -l ftp://ftp.kernel.org/pub/software/utils/$PACKAGE/ | grep "$(echo $CACHE_EXTENSION | sed 's/\./\\./g')\$" | grep -v latest | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

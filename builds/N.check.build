@@ -1,0 +1,42 @@
+PACKAGE_VERSION="0.9.14"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="C test framework"
+PROJECT_URL="http://check.sourceforge.net"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://sourceforge.net/projects/check/files/check/$PACKAGE_VERSION/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  if [[ -n "$LD_CROSS" ]]; then
+    local cross_dir="$(dirname "$LD_CROSS")"
+  else
+    local cross_dir="$(dirname $(find /bin /usr/bin -name 'ld' -executable | tail -n 1))"
+  fi
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --with-sysroot="$ENV_DIR" --disable-static
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -sL http://sourceforge.net/projects/check/files/check/ | grep -oE "/check/([0-9]+.)+/" | sed -e 's/ //g' -e 's:/check/::g' -e 's:/::g' | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
