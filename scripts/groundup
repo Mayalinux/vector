@@ -31,7 +31,8 @@ echo "Removing old directories..."
 rm -rf ${ENV_DIR} ${STAGES_DIR} ${STG_DIR} ${INSTALL_DIR} ${BUILD_DIR} ${CACHE_DIR}
 
 # Remove kernel
-find $BASE_DIR/ -name 'linux-*' -max-depth 1 -type d -exec rm -rf {} +
+echo "Removing kernel directories..."
+find $BASE_DIR/ -maxdepth 1 -name 'linux-*' -type d -exec rm -rf {} +
 
 # Setup configuration files
 mkdir -p "${ENV_DIR}" >/dev/null
@@ -51,4 +52,5 @@ CREATE TABLE shared_objects(package_name VARCHAR(256) NOT NULL, package_version 
 EOF
 
 # Delete shared obejcts database
+echo "Removing old shared-objects database..."
 rm -f $DB_SHARED
