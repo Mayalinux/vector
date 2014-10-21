@@ -1,0 +1,45 @@
+PACKAGE_VERSION="3.3.10"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Tools for monitoring running processes"
+PROJECT_URL="http://sourceforge.net/projects/procps-ng/"
+PACKAGE_URL="http://sourceforge.net/projects/procps-ng/files/Production/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BUILD_DIR/$PACKAGE_NAME" >/dev/null
+  sed -i 's:# include <ncursesw/ncurses\.h>:# include <ncurses.h>:' watch.c
+  popd >/dev/null
+
+  if [[ -n "$LD_CROSS" ]]; then
+    local cross_dir="$(dirname "$LD_CROSS")"
+  else
+    local cross_dir="$(dirname $(find /bin /usr/bin -name 'ld' -executable | tail -n 1))"
+  fi
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure LD="$cross_dir/ld" AR="$cross_dir/ar" AS="$cross_dir/as" NM="$cross_dir/nm" OBJDUMP="$cross_dir/objdump" RANLIB="$cross_dir/ranlib" STRIP="$cross_dir/strip" READELF="$cross_dir/readelf" CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --disable-static --enable-watch8bit --disable-libselinux --enable-shared --with-sysroot="$ENV_DIR" --without-systemd --with-ncurses
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -sL http://sourceforge.net/projects/$PACKAGE/files/Production/ | grep -oE "/$PACKAGE-([0-9]+.)+$(echo $CACHE_EXTENSION | sed 's/\./\\./g')/" | sed -e 's/ /\n/g' -e 's:/::g' | cut -d - -f 1,2 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}

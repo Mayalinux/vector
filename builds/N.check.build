@@ -30,7 +30,7 @@ function build() {
 }
 
 function check_latest() {
-  local ver=$(curl --connect-timeout 10 -sL http://sourceforge.net/projects/check/files/check/ | grep -oE "/check/([0-9]+.)+/" | sed -e 's/ //g' -e 's:/check/::g' -e 's:/::g' | sort -Vu | tail -n 1)
+  local ver=$(curl --connect-timeout 10 -sL http://sourceforge.net/projects/check/files/check/ | grep -oE "/check/([0-9]+.)+/" | sed -e 's/ /\n/g' -e 's:/check/::g' -e 's:/::g' | sort -Vu | tail -n 1)
 
   if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
     echo Package up to date

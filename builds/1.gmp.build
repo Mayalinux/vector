@@ -19,7 +19,7 @@ function build() {
   pushd "$BDIR" >/dev/null
   execute ../$PNAME/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-readline
   execute make -j$(($N_CPUS+1))
-  make DESTDIR="$INSTALL_DIR" install && assert_last
+  execute make DESTDIR="$INSTALL_DIR" install
   popd >/dev/null
   strip_package
 }
