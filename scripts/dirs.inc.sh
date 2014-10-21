@@ -52,3 +52,7 @@ DEP_LOGFILE=/tmp/pkg_dependencies.log
 # Package database
 # This sqlite3 database contains information about built packages
 DB_PACKAGES=$BASE_DIR/packages.sqlite
+
+# Shared objects database
+# This sqlite3 database contains information about the environment's shared objects
+DB_SHARED=$BASE_DIR/shared-objects.sqlite

@@ -10,10 +10,15 @@ function build() {
 
   extract_tar "$PACKAGE_PATH" "$(dirname "$0")/.."
 
-  local KDIR="./$PACKAGE_NAME"
+  local KDIR="$BASE_DIR/$PACKAGE_NAME"
 
   execute cp "$OTHER_DIR/linux-config" "$KDIR/.config"
   execute touch "$KDIR/cpio-mayal.txt"
+
+  # Always download the latest wireless-regdb version
+  local WIRELESS_REGDB_VERSION=$(curl --connect-timeout 10 -Sl ftp://kernel.org/pub/software/network/wireless-regdb/ | grep -E '\.tar\.xz$' | cut -d - -f 1,2 --complement | rev | cut -d . -f 1,2 --complement | cut | sort -Vu | tail -n 1)
+
+  execute curl -sL https://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-${WIRELESS_REGDB_VERSION}.tar.xz | execute xz --decompress --stdout | execute tar -xO wireless-regdb-$WIRELESS_REGDB_VERSION/db.txt >"$KDIR/net/wireless/db.txt"
 
   execute make -C "$KDIR" -j$(($N_CPUS+1)) all
   execute make -C "$KDIR" INSTALL_MOD_PATH="$INSTALL_DIR" modules_install

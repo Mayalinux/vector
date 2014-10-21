@@ -1,7 +1,0 @@
-[files]
-url=https://www.kernel.org/pub/software/network/wireless-regdb/
-file=wireless-regdb-2013.11.27.tar.xz
-
-[build]
-
-cp db.txt vector/linux-3.13.3/net/wireless/
