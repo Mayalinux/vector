@@ -16,7 +16,8 @@ function build() {
   execute touch "$KDIR/cpio-mayal.txt"
 
   # Always download the latest wireless-regdb version
-  local WIRELESS_REGDB_VERSION=$(curl --connect-timeout 10 -Sl ftp://kernel.org/pub/software/network/wireless-regdb/ | grep -E '\.tar\.xz$' | cut -d - -f 1,2 --complement | rev | cut -d . -f 1,2 --complement | cut | sort -Vu | tail -n 1)
+  echo "Downloading and applying latest wireless regulatory database..."
+  local WIRELESS_REGDB_VERSION=$(curl --connect-timeout 10 -sl ftp://kernel.org/pub/software/network/wireless-regdb/ | grep -E '\.tar\.xz$' | cut -d - -f 1,2 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
 
   execute curl -sL https://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-${WIRELESS_REGDB_VERSION}.tar.xz | execute xz --decompress --stdout | execute tar -xO wireless-regdb-$WIRELESS_REGDB_VERSION/db.txt >"$KDIR/net/wireless/db.txt"
 
