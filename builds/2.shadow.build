@@ -7,7 +7,7 @@ BUILD_FAST=yes
 LIBRARY=no
 
 function build() {
-  depends_on Linux-PAM
+  depends_on linux-pam
   depends_on cracklib
 
   require "$PACKAGE_PATH"

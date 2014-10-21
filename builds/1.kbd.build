@@ -8,7 +8,7 @@ LIBRARY=yes
 
 function build() {
   depends_on autoconf
-  depends_on Linux-PAM
+  depends_on linux-pam
 
   require "$PACKAGE_PATH"
 
