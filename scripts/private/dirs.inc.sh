@@ -4,7 +4,12 @@
 
 # Base directory
 # This is the root directory of the project
-BASE_DIR="$(realpath -L -P $(dirname "$0")/..)"
+BASE_DIR="$(realpath -LP $(dirname "$0")/..)"
+
+while [[ ! -f $BASE_DIR/settings.conf.sh ]]; do
+  BASE_DIR="$(realpath -L "$BASE_DIR/..")"
+  [[ "$BASE_DIR" = / ]] && echo "ERROR: Unable to locate base project directory. Please add your settings.conf.sh file." >&2 && exit 1
+done
 
 # Stages directory
 # This directory contains ready-to-deploy packages (each in its stage directory)
@@ -44,6 +49,10 @@ OTHER_DIR=$BASE_DIR/other
 # Initramfs directory
 # This directory contains the files that will be added to the initramfs
 INITRAMFS_DIR=$BASE_DIR/initramfs
+
+# Scripts directory
+# This directory contains the script files
+SCRIPTS_DIR=$BASE_DIR/scripts
 
 # Shared object dependencies log file
 # This file contains information about the shared objects needed for a package

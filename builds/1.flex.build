@@ -23,52 +23,13 @@ function build() {
 }
 
 function check_latest() {
-  python3 <<EOF
-import sys
-from html.parser import HTMLParser
-from urllib.request import urlopen
-import subprocess
-from subprocess import Popen
+  local ver=$(curl --connect-timeout 10 -Ls "http://sourceforge.net/projects/$PACKAGE/files/" | grep -oE "$PACKAGE-[0-9.]+$(echo $CACHE_EXTENSION | sed 's/\./\\./g')" | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
 
-VERSIONS = []
-
-class KernelPageParser(HTMLParser):
-  def __init__(self):
-    super().__init__()
-    self.data = False
-
-  def handle_starttag(self, tag, attrs):
-    global VERSIONS
-
-    if tag == 'tr':
-      goal = 0
-      for name, value in attrs:
-        if name == 'title' and value.startswith('flex-') and value.endswith('$CACHE_EXTENSION'):
-          goal += 1
-          ver = value[len('flex-'):-len('$CACHE_EXTENSION')]
-        elif name == 'class' and 'file' in value:
-          goal += 1
-      if goal == 2:
-        VERSIONS.append(ver)
-
-KernelPageParser().feed(urlopen('http://sourceforge.net/projects/flex/files/').read().decode('utf-8'))
-
-with Popen(['sort', '-V'], stdin=subprocess.PIPE, stdout=subprocess.PIPE) as pipe:
-  for v in VERSIONS:
-    pipe.stdin.write('{}\n'.format(v).encode('utf-8'))
-
-  pipe.stdin.close()
-
-  with Popen(['tail', '-n', '-1'], stdin=subprocess.PIPE, stdout=subprocess.PIPE) as pipe2:
-    pipe2.stdin.write(pipe.stdout.read())
-    pipe2.stdin.close()
-    ver = pipe2.stdout.read().decode('utf-8').strip(' \n\t')
-
-if ver != '$PACKAGE_VERSION':
-  print('New version %s detected' % ver)
-  sys.exit(2)
-else:
-  print('Package up to date')
-  sys.exit(0)
-EOF
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
 }

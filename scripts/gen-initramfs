@@ -11,9 +11,9 @@
 sources=(bin/mv bin/cp bin/umount bin/mount bin/mkdir bin/chroot bin/ls bin/rmdir bin/rm bin/mknod bin/bash bin/mkfifo sbin/switch_root) 
 shared_libraries=(libc libuuid libmount libattr libncurses libncursesw libblkid ld libdl libcap libacl)
 
-source $(dirname "$0")/dirs.inc.sh
+source $(dirname "$0")/private/dirs.inc.sh
 
-$(dirname "$0")/build-stage 1
+$SCRIPTS_DIR/build-stage 1
 
 [[ ! -d "$INITRAMFS_DIR" ]] && mkdir -p "$INITRAMFS_DIR"
 
@@ -39,7 +39,7 @@ done
 
 popd >/dev/null
 
-if ! $(dirname "$0")/gen-cpio-index; then
+if ! $SCRIPTS_DIR/private/gen-cpio-index; then
   echo "Unable to generate cpio index" >&2
   exit 1
 fi
@@ -64,4 +64,4 @@ rm -rf $BUILD_DIR/* && \
   tar -uf "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" "boot/$KPKGNAME" && \
   popd >/dev/null && \
   xz "$(dirname "$PKG_NAME")/$(basename "$PKG_NAME" .xz)" && \
-  $(dirname "$0")/toenv 1 "$KNAME"
+  $SCRIPTS_DIR/private/toenv 1 "$KNAME"

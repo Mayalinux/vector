@@ -37,7 +37,7 @@ case "$STAGE" in
 esac
 
 # Generate dependencies
-$(realpath -L -P $(dirname "$0"))/showdepends
+$SCRIPTS_DIR/private/showdepends
 
 # Create output filename
 PKG_FILE="${PKG_NAME}.tar.xz"

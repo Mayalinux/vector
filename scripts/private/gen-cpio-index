@@ -9,7 +9,7 @@
 
 source $(dirname "$0")/dirs.inc.sh
 
-exec 3>$(dirname "$0")/../linux-*/cpio-mayal.txt
+exec 3>$BASE_DIR/linux-*/cpio-mayal.txt
 
 ldconfig -n -r "$INITRAMFS_DIR" /lib /lib64 /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64
 

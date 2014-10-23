@@ -13,7 +13,7 @@
 #### dir is the directory where the files need to be installed
 ####
 
-source $(dirname "$0")/dirs.inc.sh
+source $(dirname "$0")/private/dirs.inc.sh
 shopt -s nullglob
 exec 3>/dev/null
 
@@ -51,6 +51,11 @@ copyStage 2
 copyStage 3
 copyStage P
 
+echo Unpacking configuration files...
+pushd "$DST_DIR" >&3
+tar -xf $OTHER_DIR/misc-config.tar.xz
+popd >&3
+
 echo Adding directories...
 mkdir -p ${DST_DIR}/{dev,proc,sys,tmp,root,opt,var/log,home,var/run}
 
@@ -70,4 +75,3 @@ if [[ "$USER" = root ]]; then
 else
 	echo "User is not root, not setting advanced environment up."
 fi
-
