@@ -8,3 +8,4 @@ env/*
 /packages.sqlite
 /shared-objects.sqlite
 /settings.conf.sh
+/TODO.local

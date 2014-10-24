@@ -1,9 +1,0 @@
-[files]
-url=https://www.kernel.org/pub/software/network/iw/
-file=iw-3.14.tar.xz
-
-[build]
-make
-
-[install]
-make DESTDIR=/tmp/pkg install

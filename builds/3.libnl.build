@@ -1,0 +1,37 @@
+PACKAGE_VERSION="3.2.25"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Netlink layer library"
+PROJECT_URL="https://github.com/thom311/libnl"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="https://github.com/thom311/libnl/releases/download/${PACKAGE}$(echo $PACKAGE_VERSION | tr . _)/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  # You need to have bison installed, in order to build this package
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-static --with-sysroot="$ENV_DIR" --disable-debug
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver="$(curl --connect-timeout 10 -sL https://api.github.com/repos/thom311/$PACKAGE/releases | grep -oE "\"tag_name\": \"$PACKAGE[0-9_]+\"" | sed -e "s/\"tag_name\": \"$PACKAGE//" -e 's/"//g' | tr _ . | sort -Vu | tail -n 1)"
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
