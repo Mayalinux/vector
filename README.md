@@ -39,7 +39,7 @@ Refer to the *settings.conf.sh-example* file to see a very basic example of
 settings file (which is the one I use).
 
 ## Building a single package
-The *scripts/builder* tool builds a single package and its dependencies.
+The *scripts/build* tool builds a single package and its dependencies.
 Each package contains a **build file** in the *builds/* directory which is used
 to configure the build process.
 

@@ -168,8 +168,8 @@ function check_latest() {
 
 function pack() {
   register_build
-  execute "$EXEC_PATH/private/pack" "$STAGE" "$PACKAGE_NAME"
-  execute "$EXEC_PATH/toenv" "$STAGE" "$PACKAGE_NAME"
+  execute "$SCRIPTS_DIR/private/pack" "$STAGE" "$PACKAGE_NAME"
+  execute "$SCRIPTS_DIR/private/toenv" "$STAGE" "$PACKAGE_NAME"
   [[ "$LIBRARY" = yes ]] && execute ldconfig -r "${ENV_DIR}" -n /{lib,lib64} /usr/{lib,lib64} /usr/local/{lib,lib64}
 }
 
