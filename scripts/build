@@ -115,19 +115,7 @@ function extract_tar() {
 }
 
 ##
-## Exits if the last command called immediately before has failed.
-##
-## Usage: assert_last
-##
-function assert_last() {
-  [[ $? -ne 0 ]] && echo "Last command returned $?" && exit 1
-}
-
-##
 ## Executes a command and checks its exit value is 0.
-## Do not use 'execute' with commands taking complex parameters
-## such as CFLAGS="-O2 -I." because there might be errors in
-## parameter interpretation. Use assert_last in this cases.
 ##
 ## Usage: execute command [arg [...]]
 ##
@@ -164,6 +152,43 @@ function check_latest() {
   echo "Last version check not implemented for $PACKAGE_NAME" >&2
 
   exit 1
+}
+
+##
+## Default check-latest implementation.
+##
+## Usage: package_check_latest DOWNLOAD_URL SEARCH
+##
+## Params:
+##  DOWNLOAD_URL: The URL to check for updates
+##  SEARCH: The regexp to match in the DOWNLOAD_URL (defaults to searching for PACKAGE_NAME-DOTTED_NUMERIC_VERSION.EXTENSION)
+##
+## Return: nothing. Exits with 0 if the package is up to date, with 2 if the package is outdated
+##
+## NOTE: Current limitations: package extension must contains two dots (i.e.: .tar.gz)
+##
+function package_check_latest() {
+  local DOWNLOAD_URL=$1
+  local SEARCH="$2"
+  local curl_opts="--connect-timeout 10 -s"
+
+  [[ -z "$SEARCH" ]] && SEARCH="$PACKAGE-[0-9.]+$(echo $CACHE_EXTENSION | sed 's/\./\\./g')"
+
+  if [[ "${DOWNLOAD_URL:0:6}" == 'ftp://' ]]; then
+    curl_opts+=" -l"
+  else # Assume HTTP(S)
+    curl_opts+=" -L"
+  fi
+  
+  local ver=$(curl $curl_opts "$DOWNLOAD_URL" | grep -oE "$SEARCH" | sed "s|$PACKAGE|$(echo $PACKAGE | tr - _)|" | cut -d - -f 1 --complement | rev | cut -d . -f 1,2 --complement | rev | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
 }
 
 function pack() {

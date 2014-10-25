@@ -1,9 +1,0 @@
-[files]
-url=http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
-file=wireless_tools.29.tar.gz
-
-[build]
-make
-
-[install]
-make PREFIX=/tmp/pkg/usr install
