@@ -2,7 +2,12 @@
 #
 # Shared objects database generator
 # 
-# Usage: gen-lib-db.pl
+# Usage: gen-lib-db.pl [package]
+#
+# package: package file to add to the database.
+#
+# If no argument is provided, generates a new database from the compiled
+# packages.
 #
 use strict;
 use warnings;
@@ -18,12 +23,15 @@ use constant STAGES_DIR => 'pkgs'; # Directory name in base_dir
 
 my @shared;
 my $base_dir;
+my $package;
 do {
   my ($vol, $dir, $fname) = File::Spec->splitpath($0);
   $base_dir = abs_path(File::Spec->catdir(getcwd, $dir, '/../'));
 };
 my $stages_dir = File::Spec->catdir($base_dir, STAGES_DIR);
 my $db_path = File::Spec->catfile($base_dir, DB_PATH);
+
+$package = $ARGV[0] if defined $ARGV[0];
 
 # Checks whether the provided ($_) file is a wanted file
 # 
@@ -37,7 +45,10 @@ sub file_wanted {
 #
 # Usage: file_func
 sub file_func {
-  return unless file_wanted $_;
+  unless(file_wanted $_) {
+    say STDERR "Ignoring file $_..." if -f $_;
+    return;
+  }
 
   open my $tar_file, '-|', "xz --decompress --stdout $_" or die("Unable to open $_");
   my $tar = Archive::Tar->new($tar_file) or die('Unable to open tar file');
@@ -54,9 +65,14 @@ sub file_func {
 }
 
 # Put the needed SOs in @shared
-for (1..3, 'P') {
-  say "Scanning stage $_...";
-  File::Find::find({ 'wanted' => \&file_func, 'no_chdir' => 1}, File::Spec->catdir($stages_dir, "stage$_"));
+if (not defined $package) {
+  for (1..3, 'P') {
+    say "Scanning stage $_...";
+    File::Find::find({ 'wanted' => \&file_func, 'no_chdir' => 1}, File::Spec->catdir($stages_dir, "stage$_"));
+  }
+} else {
+  $_ = $package;
+  file_func;
 }
 
 # Remove paths and extensions
@@ -75,9 +91,11 @@ for (1..3, 'P') {
 my $db = DBI->connect("dbi:SQLite:dbname=$db_path", '', '', { 'RaiseError' => 1 }) or die $DBI::errstr;
 
 $db->begin_work;
-$db->do('DROP TABLE IF EXISTS so');
-$db->do('CREATE TABLE so(library VARCHAR(256) NOT NULL PRIMARY KEY, package VARCHAR(256) NOT NULL) WITHOUT ROWID')
-  or die("Unable to create database: $db->errstr");
+if (not defined $package) {
+  $db->do('DROP TABLE IF EXISTS so');
+  $db->do('CREATE TABLE so(library VARCHAR(256) NOT NULL PRIMARY KEY ON CONFLICT IGNORE, package VARCHAR(256) NOT NULL) WITHOUT ROWID')
+    or die("Unable to create database: $db->errstr");
+}
 
 my $stmt = $db->prepare('INSERT INTO so VALUES(?, ?)');
 

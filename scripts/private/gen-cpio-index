@@ -8,6 +8,7 @@
 ####
 
 source $(dirname "$0")/dirs.inc.sh
+cd $BASE_DIR
 
 exec 3>$BASE_DIR/linux-*/cpio-mayal.txt
 

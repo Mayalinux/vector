@@ -14,6 +14,7 @@
 ####
 
 source $(dirname "$0")/private/dirs.inc.sh
+cd $BASE_DIR
 shopt -s nullglob
 exec 3>/dev/null
 

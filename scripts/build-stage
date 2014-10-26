@@ -12,6 +12,7 @@
 STAGE="$1"
 
 source $(dirname "$0")/private/dirs.inc.sh
+cd $BASE_DIR
 
 echo "Building stage ${STAGE}..."
 

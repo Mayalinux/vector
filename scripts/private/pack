@@ -13,6 +13,7 @@
 #### pack-name is the package name (e.g.: linux-3.13.3)
 
 source $(dirname "$0")/dirs.inc.sh
+cd $BASE_DIR
 exec 3>/dev/null
 
 # Set args
@@ -58,6 +59,9 @@ echo -n "- * Original size: "
 du -h "$INSTALL_DIR" | tail -n 1 | awk '{ print $1; }'
 echo -n "- * Packed size: "
 du -h "$PKG_PATH" | awk '{ print $1; }'
+
+# Update shared-objects database
+$SCRIPTS_DIR/gen-lib-db.pl "$PKG_PATH"
 
 # Display shared dependencies
 if [[ -f "$DEP_LOGFILE" ]]; then
