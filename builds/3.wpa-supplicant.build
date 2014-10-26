@@ -1,0 +1,52 @@
+PACKAGE_VERSION="2.3"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="WPA supplicant tool"
+PROJECT_URL="http://w1.fi/wpa_supplicant/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://w1.fi/releases/$(echo $PACKAGE | tr - _)-${PACKAGE_VERSION}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on readline
+  depends_on ncurses
+  depends_on libnl
+  depends_on gnutls
+  depends_on libgcrypt
+  depends_on libgpg-error
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$(echo $PACKAGE_NAME | sed 's/-/_/')/$(echo $PACKAGE | tr - _)"
+
+  pushd "$BDIR" >/dev/null
+  # Customize .config file
+  # wpa_supplicant needs this to configure the build
+  exec 180>.config
+  echo -e "CFLAGS+=$CFLAGS $CFLAGS_INCLUDE_DIRS\nLDFLAGS+=$LDFLAGS $LDFLAGS_LIB_DIRS" >&180
+  echo -e "export LIBDIR=/usr/lib/\nexport BINDIR=/usr/sbin/" >&180
+  echo export PKG_CONFIG="PKG_CONFIG_SYSROOT_DIR=\"$ENV_DIR\" PKG_CONFIG_LIBDIR=\"$ENV_DIR/usr/lib/pkgconfig\" pkg-config" >&180
+  execute sed -e 's|^#\(CONFIG_LIBNL32=\).*|\1y|' \
+    -e 's|^#\(CONFIG_WPS=\).*|\1y|' \
+    -e 's|^\(CONFIG_SMARTCARD=.*\)|#\1|' \
+    -e 's|^#\(CONFIG_READLINE=\).*|\1y|' \
+    -e 's|^[#]\{0,1\}CONFIG_TLS=.*|CONFIG_TLS=gnutls|' \
+    -e 's|^#\(CONFIG_AUTOSCAN=\).*|\1y|' \
+    -e 's|^#\(CONFIG_NO_STDOUT_DEBUG=\).*|\1y|' \
+    -e 's|^#\(CONFIG_IEEE80211N=\).*|\1y|' <defconfig >&180
+  exec 180>&-
+
+  # Remove debugging options
+  execute sed -i 's!^[ \t]*CFLAGS[ \t]*=[ \t]*\(.*\)-g\(.*\)!CFLAGS=\1 \2!' Makefile
+
+  execute make  -j$(($N_CPUS+1)) #-n | less; exit
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest http://w1.fi/releases/ "$(echo $PACKAGE | tr - _)-[0-9.]+$CACHE_EXTENSION"
+}

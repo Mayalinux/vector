@@ -1,0 +1,38 @@
+PACKAGE_VERSION="3.3.9"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Secure communications library for SSL, TLS, DTLS protocols"
+PROJECT_URL="http://gnutls.org/"
+PACKAGE_URL="ftp://ftp.gnutls.org/gcrypt/$PACKAGE/v$(echo $PACKAGE_VERSION | cut -d . -f 1,2)/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on gcc
+  depends_on nettle
+  depends_on zlib
+  depends_on gmp
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --with-sysroot="$ENV_DIR" --with-included-libtasn1 --with-{libregex,zlib} --enable-{rsa-support,hreatbeat-support,srp-authentication,rsa-export,padlock,dtls-srtp-support,alpn-support,psk-authentication,anon-authentication,dhe,ecdhe,openpgp-authentication,ocsp,shared,libdane,openssl-compatibility} --disable-{static,guile,tests,valgrind-tests,gtk-doc}
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -sl ftp://ftp.gnutls.org/gcrypt/$PACKAGE/ | grep -E '^v[0-9.]+' | sed 's/^v//' | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$(echo $PACKAGE_VERSION | cut -d . -f 1,2)" ]]; then
+    package_check_latest "ftp://ftp.gnutls.org/gcrypt/$PACKAGE/v$(echo $PACKAGE_VERSION | cut -d . -f 1,2)/"
+  else
+    echo "New version $ver detected"
+  fi
+}
