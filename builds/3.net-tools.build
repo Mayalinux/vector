@@ -1,0 +1,28 @@
+PACKAGE_VERSION="1.60"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Base networking utilities"
+PROJECT_URL="http://net-tools.sourceforge.net/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="https://github.com/Mayalinux/$PACKAGE/archive/v${PACKAGE_VERSION}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  execute make COPTS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LOPTS="$LDFLAGS $LDFLAGS_LIB_DIRS" 
+  execute make BASEDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  # Need this since sourceforge repository releases with differente extension
+  CACHE_EXTENSION=".tar.bz2"
+  package_check_latest http://sourceforge.net/projects/net-tools/files/
+}
