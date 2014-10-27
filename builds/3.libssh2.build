@@ -1,0 +1,31 @@
+PACKAGE_VERSION="1.4.3"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Clientside C library for the SSH2 protocol"
+PROJECT_URL="http://libssh2.org/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="http://libssh2.org/download/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  depends_on libgcrypt
+  depends_on zlib
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure LD="$CROSS_LD" CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-rpath --with-sysroot="$ENV_DIR" --with-libgcrypt --with-libz --disable-debug --enable-shared --disable-static --disable-examples-build
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest http://libssh2.org/download/
+}

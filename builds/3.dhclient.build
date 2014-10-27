@@ -1,0 +1,36 @@
+PACKAGE_VERSION="4.3.1"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="DHCP client"
+PROJECT_URL="http://www.isc.org/downloads/dhcp/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="ftp://ftp.isc.org/isc/dhcp/$PACKAGE_VERSION/dhcp-${PACKAGE_VERSION}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/dhcp-$PACKAGE_VERSION"
+
+  pushd "$BDIR" >/dev/null
+  # This is a stupid configure script, do not explicitly disable stuff or it will be enabled
+  execute ./configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  local ver=$(curl --connect-timeout 10 -sl ftp://ftp.isc.org/isc/dhcp/ | grep -E '^[0-9.]+$' | sort -Vu | tail -n 1)
+
+  if [[ "$ver" == "$PACKAGE_VERSION" ]]; then
+    echo Package up to date
+    exit 0
+  else
+    echo "New version $ver detected"
+    exit 2
+  fi
+}
