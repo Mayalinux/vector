@@ -73,8 +73,8 @@ sub file_func {
   my @files = $tar->get_files;
   
   for (@files) {
-    next unless ($_->name =~ /\.so[0-9.]*/ && $_->type == FILE && $_->mode & 0500 && $_->name !~ /\/perl[0-9]+\//);
-    push @shared, [$_->name, $File::Find::name];
+    next unless ($_->name =~ /\.so[0-9.]*/ && $_->type == FILE && $_->mode & 0100 && $_->name !~ /\/perl[0-9]+\//);
+    push @shared, [$_->name, !defined($package)? $File::Find::name: $package];
   }
 
   undef @files;
@@ -118,9 +118,7 @@ if (not defined $package) {
 my $stmt = $db->prepare('INSERT INTO so VALUES(?, ?)');
 
 for (@shared) {
-  my @rec = @{$_};
-  my $soname = $rec[0];
-  my $pkname = $rec[1];
+  my ($soname, $pkname) = @{$_};
 
   $stmt->execute($soname, $pkname) or warn "Unable to insert $soname: $db->errstr";
 }
