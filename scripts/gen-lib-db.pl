@@ -24,10 +24,28 @@ use constant STAGES_DIR => 'pkgs'; # Directory name in base_dir
 my @shared;
 my $base_dir;
 my $package;
-do {
-  my ($vol, $dir, $fname) = File::Spec->splitpath($0);
-  $base_dir = abs_path(File::Spec->catdir(getcwd, $dir, '/../'));
-};
+{
+  do {
+    my ($vol, $dir, $fname) = File::Spec->splitpath($0);
+    $base_dir = abs_path(File::Spec->catdir(getcwd, $dir, '/../'));
+  
+    if(defined $base_dir) {
+      if(-d File::Spec->catfile($base_dir, STAGES_DIR)) {
+        last;
+      }
+    }
+
+    $base_dir = abs_path(File::Spec->catdir($dir, '../'));
+
+    if(defined $base_dir) {
+      if(-d File::Spec->catfile($base_dir, STAGES_DIR)) {
+        last;
+      }
+    }
+
+    die 'Could not locate base directory.'
+  };
+}
 my $stages_dir = File::Spec->catdir($base_dir, STAGES_DIR);
 my $db_path = File::Spec->catfile($base_dir, DB_PATH);
 
