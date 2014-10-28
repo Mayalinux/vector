@@ -1,0 +1,33 @@
+PACKAGE_VERSION="6.7p1"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="SSH client, server and utilities"
+PROJECT_URL="http://www.openssh.com/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="ftp://openbsd.mirror.garr.it/pub/OpenBSD/OpenSSH/portable/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on linux-pam
+  depends_on zlib
+  depends_on openssl
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="-O2 $CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --without-rpath --with-cflags --with-ldflags --with-pam
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  # Already stripped internally
+  #strip_package
+}
+
+function check_latest() {
+  package_check_latest ftp://openbsd.mirror.garr.it/pub/OpenBSD/OpenSSH/portable/ "$PACKAGE-[0-9.p]+$(echo $CACHE_EXTENSION | sed 's/\./\\./g')"
+}

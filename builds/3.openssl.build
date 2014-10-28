@@ -1,0 +1,31 @@
+PACKAGE_VERSION="1.0.1j"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="SSL libraries and tools"
+PROJECT_URL="https://www.openssl.org/"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="ftp://ftp.openssl.org/source/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on perl
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  # Such a crappy configure script...
+  execute ./config --prefix=/usr threads zlib-dynamic no-krb5 $CFLAGS_INCLUDE_DIRS $LDFLAGS_LIB_DIRS --install_prefix="$INSTALL_DIR" -D_REENTRANT -fPIC
+  # Not designed for parallel building
+  execute make
+  execute make install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest ftp://ftp.openssl.org/source/ "$PACKAGE-[0-9.a-z]+$(echo $CACHE_EXTENSION | sed 's/\./\\./g')"
+}
