@@ -109,11 +109,9 @@ if (not defined $package) {
 my $db = DBI->connect("dbi:SQLite:dbname=$db_path", '', '', { 'RaiseError' => 1 }) or die $DBI::errstr;
 
 $db->begin_work;
-if (not defined $package) {
-  $db->do('DROP TABLE IF EXISTS so');
-  $db->do('CREATE TABLE so(library VARCHAR(256) NOT NULL PRIMARY KEY ON CONFLICT IGNORE, package VARCHAR(256) NOT NULL) WITHOUT ROWID')
-    or die("Unable to create database: $db->errstr");
-}
+$db->do('DROP TABLE IF EXISTS so') unless defined $package;
+$db->do('CREATE TABLE IF NOT EXISTS so(library VARCHAR(256) NOT NULL PRIMARY KEY ON CONFLICT IGNORE, package VARCHAR(256) NOT NULL) WITHOUT ROWID')
+  or die("Unable to create database: $db->errstr");
 
 my $stmt = $db->prepare('INSERT INTO so VALUES(?, ?)');
 
