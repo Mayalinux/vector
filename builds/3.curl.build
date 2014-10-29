@@ -1,0 +1,35 @@
+PACKAGE_VERSION="7.38.0"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Command line tool for transferring data with URL syntax"
+PROJECT_URL="http://curl.haxx.se/"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="http://curl.haxx.se/download/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on libidn
+  depends_on gcc
+  depends_on libssh2
+  depends_on gnutls
+  depends_on nettle
+  depends_on zlib
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS" CPPFLAGS="$CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-{debug,warnings,werror,curldebug,static,manual} --enable-{http,ftp,file,proxy,telnet,tftp,ipv6,libgcc,versioned-symbols,sspi,crypto-auth,tls-srp,cookies} --without-ssl --without-nss --with-gnutls --without-librtmp --disable-ldap --with-sysroot="$ENV_DIR" LD="$CROSS_LD"
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest http://curl.haxx.se/download/
+}

@@ -2,7 +2,8 @@ PACKAGE_VERSION="6.1.19"
 PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
 PACKAGE_DESCRIPTION="Berkley database library"
 PROJECT_URL="http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html"
-PACKAGE_URL="http://mayalinux.github.io/repo/${PACKAGE_NAME}${CACHE_EXTENSION}"
+CACHE_EXTENSION=".tar.gz"
+PACKAGE_URL="https://github.com/Mayalinux/$PACKAGE/archive/v${PACKAGE_VERSION}${CACHE_EXTENSION}"
 BUILD_FAST=yes
 LIBRARY=yes
 
@@ -15,7 +16,7 @@ function build() {
   execute mkdir -p "$BDIR"
 
   pushd "$BDIR" >/dev/null
-  execute ../$PACKAGE_NAME/dist/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-debug --disable-diagnostic --disable-java --disable-jdbc --disable-tcl --enable-static --enable-shared --enable-dbm
+  execute ../$PACKAGE_NAME/dist/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --disable-debug --disable-diagnostic --disable-java --disable-jdbc --disable-tcl --enable-static --enable-shared --enable-dbm --enable-compat185
   execute make -j$(($N_CPUS+1))
   execute make DESTDIR="$INSTALL_DIR" install
   rm -rf "$INSTALL_DIR/usr/docs"

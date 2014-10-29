@@ -1,0 +1,34 @@
+PACKAGE_VERSION="3.16.0"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="TCP/IP network and traffic control utilitites"
+PROJECT_URL="https://www.kernel.org/pub/linux/utils/net/iproute2/"
+CACHE_EXTENSION=".tar.xz"
+PACKAGE_URL="https://www.kernel.org/pub/linux/utils/net/iproute2/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on iptables
+  depends_on db
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/$PACKAGE_NAME"
+
+  pushd "$BDIR" >/dev/null
+  execute ./configure # This is not auto-tools
+  execute sed -i \
+    -e "s|\([ \t]*PKG_CONFIG[ \t]*:\{0,1\}=\)\(.*\)|\1 PKG_CONFIG_LIBDIR='$ENV_DIR/usr/lib/pkgconfig' PKG_CONFIG_SYSROOT_DIR='$ENV_DIR' \2|" \
+    ./Config
+
+  execute make -j$(($N_CPUS+1)) CCOPTS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS"
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest ftp://www.kernel.org/pub/linux/utils/net/iproute2/
+}

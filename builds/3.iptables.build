@@ -1,0 +1,28 @@
+PACKAGE_VERSION="1.4.21"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Linux Kernel packet control tool"
+PROJECT_URL="http://www.netfilter.org/projects/iptables/index.html"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="ftp://ftp.netfilter.org/pub/iptables/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=yes
+
+function build() {
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  execute ../$PACKAGE_NAME/configure CFLAGS="$CFLAGS $CFLAGS_INCLUDE_DIRS" LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-devel --enable-libipq --enable-bpf-compiler --with-sysroot="$ENV_DIR" --with-kernel="$KERNEL_DIR" PKG_CONFIG_LIBDIR="$ENV_DIR/usr/lib/pkgconfig"
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest ftp://ftp.netfilter.org/pub/iptables/
+}
