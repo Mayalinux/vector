@@ -18,7 +18,7 @@ function build() {
 
   pushd "$BDIR" >/dev/null
   # Such a crappy configure script...
-  execute ./config --prefix=/usr threads zlib-dynamic no-krb5 $CFLAGS_INCLUDE_DIRS $LDFLAGS_LIB_DIRS --install_prefix="$INSTALL_DIR" -D_REENTRANT -fPIC
+  execute ./config --prefix=/usr shared threads zlib-dynamic no-krb5 $CFLAGS_INCLUDE_DIRS $LDFLAGS_LIB_DIRS --install_prefix="$INSTALL_DIR" -D_REENTRANT -fPIC
   # Not designed for parallel building
   execute make
   execute make install
