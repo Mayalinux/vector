@@ -30,6 +30,21 @@ The *scripts* directory contains all the automation scripts used to build the
 system. Each script contains a header which explains how to run it and what it
 does.
 
+## Needed tools
+Here is a list of some needed tools:
+* bc
+* bison
+* binutils supporting sysroots (*see settings.conf.sh-example*)
+* perl
+* sed
+* awk
+* gcc
+* findutils
+* bash
+* pkg-config
+
+There might be other I forgot to mention.
+
 ## Configuring common options
 To configure common build options, such as CFLAGS and LDFLAGS, create in the
 root directory a file named *settings.conf.sh* and put there the settings you
