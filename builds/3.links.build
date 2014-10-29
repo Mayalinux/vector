@@ -1,0 +1,38 @@
+PACKAGE_VERSION="2.8"
+PACKAGE_NAME="${PACKAGE}-${PACKAGE_VERSION}"
+PACKAGE_DESCRIPTION="Links web browser"
+PROJECT_URL="http://links.twibright.com/"
+CACHE_EXTENSION=".tar.bz2"
+PACKAGE_URL="http://links.twibright.com/download/${PACKAGE_NAME}${CACHE_EXTENSION}"
+BUILD_FAST=yes
+LIBRARY=no
+
+function build() {
+  depends_on xz
+  depends_on openssl
+  depends_on zlib
+
+  require "$PACKAGE_PATH"
+
+  extract_tar "$PACKAGE_PATH" "$BUILD_DIR"
+
+  local BDIR="$BUILD_DIR/build"
+  execute mkdir -p "$BDIR"
+
+  pushd "$BDIR" >/dev/null
+  export CFLAGS="$CFLAGS"
+  export CPPFLAGS="$CFLAGS_INCLUDE_DIRS"
+  export LDFLAGS="$LDFLAGS $LDFLAGS_LIB_DIRS"
+  export PKG_CONFIG_SYSROOT_DIR="$ENV_DIR"
+  export PKG_CONFIG_LIBDIR="$ENV_DIR/usr/lib/pkgconfig"
+  export PKG_CONFIG_PATH="$ENV_DIR/usr/lib64/pkgconfig"
+  execute ../$PACKAGE_NAME/configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --without-{gpm,svgalib,x,directfb,pmshell,windows,atheos,grx,libjpeg,libtiff} --disable-graphics --with-ssl
+  execute make -j$(($N_CPUS+1))
+  execute make DESTDIR="$INSTALL_DIR" install
+  popd >/dev/null
+  strip_package
+}
+
+function check_latest() {
+  package_check_latest http://links.twibright.com/download/
+}
